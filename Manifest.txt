@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/depix
+lib/depix.rb
+test/test_depix.rb
