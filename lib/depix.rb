@@ -17,7 +17,7 @@ module Depix
   class Reader
     def read_from_file(path)
       hash = deep_parse(File.open(path, 'r'), Structs::DPX_INFO)
-      puts hash.inspect
+      puts hash[:image][:pixels_per_line]
     end
   
     private
@@ -28,7 +28,7 @@ module Depix
         if element.size == 3
           key, cast, size = element
           parsed[key] = process_cast(cast, io, size, key)
-          puts "#{key}=#{parsed[key].inspect} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
+       #   puts "#{key}=#{parsed[key].inspect} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
 
           @big_endian = (parsed[key] == "SDPX") if element[0] == :magic
         elsif element.size == 2
@@ -49,10 +49,10 @@ module Depix
             unpad(data.unpack("A*").pop)
           when cast_to == Integer
             case chunk_size
-            when 4
-              @big_endian ? data.unpack("N") : data.unpack("V")
-            when 2
-              @big_endian ? data.unpack("n") : data.unpack("v")
+              when 4
+                @big_endian ? data.unpack("N") : data.unpack("V")
+              when 2
+                @big_endian ? data.unpack("n") : data.unpack("v")
             end
           when cast_to == Float
             @big_endian ? data.unpack("g") : data.unpack("f")
