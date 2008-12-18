@@ -1,6 +1,15 @@
 # Basically a copy of http://trac.imagemagick.org/browser/ImageMagick/trunk/coders/dpx.c
+# Which is a reformulation of http://www.cineon.com/ff_draft.php
+# Which is a preamble to some SMPTE crap that you have to buy for 14 bucks.
+#
+# It's very fragile - in the world of C, everything is fixed length. If Tolstoy wanted to write
+# "War and Peace" in C he would need to know the number of letters ahead. It has good and bad
+# qualities - the good ones being computers go faster like that. The rest are bad parts.
 module Depix; module Structs
-
+  
+  # To avoid fucking up with sizes afterwards
+  UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
+  
   def self.struct_size(struct_const) #:nodoc
     struct_const.inject(0){| s, e | s + e[-1]}
   end
@@ -47,14 +56,11 @@ module Depix; module Structs
     :UserDef8Element => 156,
   }
   
-  # To avoid fucking up with sizes afterwards
-  UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
-  
   FILE_INFO = [
     [:magic, Integer, UINT],
     [:image_offset, Integer, UINT],
     
-    [:version, String, UINT],
+    [:version, String, 8],
     
     [:file_size, Integer, UINT],
     [:ditto_key, Integer, UINT],
@@ -125,8 +131,12 @@ module Depix; module Structs
     [:reserve, String, 52],
   ]
   
-  BORDER = [[Integer, USHORT] * 4]
-  ASPECT_RATIO = [[Integer, UINT] * 2]
+  BORDER = [:XL, :XR, :YT, :YB].map{|s| [s, Integer, USHORT] }
+
+  ASPECT_RATIO = [
+    [:h, Integer, UINT],
+    [:v, Integer, UINT],
+  ]
   
   ORIENTATION_INFO = [
   
@@ -144,11 +154,8 @@ module Depix; module Structs
     [:device, String, 32],
     [:serial, String, 32],
     
-#    [:border, BORDER, struct_size(BORDER)],
-#    [:aspect_ratio, ASPECT_RATIO, struct_size(ASPECT_RATIO)],
-    
-    [:border, String, USHORT * 4],
-    [:aspect_ratio, String, UINT * 2],
+    [:border, BORDER, struct_size(BORDER)],
+    [:aspect_ratio, ASPECT_RATIO, struct_size(ASPECT_RATIO)],
     
     [:reserve, String, 28],
   ]
@@ -177,6 +184,7 @@ module Depix; module Structs
   
   USER_INFO = [
     [:id, String, 32],
+    [:user_data, Integer, UINT],
   ]
   
   DPX_INFO = [
