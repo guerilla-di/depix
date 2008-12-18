@@ -28,7 +28,7 @@ module Depix
         if element.size == 3
           key, cast, size = element
           parsed[key] = process_cast(cast, io, size, key)
-       #   puts "#{key}=#{parsed[key].inspect} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
+          puts "#{key}=#{parsed[key].inspect} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
 
           @big_endian = (parsed[key] == "SDPX") if element[0] == :magic
         elsif element.size == 2
@@ -50,12 +50,12 @@ module Depix
           when cast_to == Integer
             case chunk_size
               when 4
-                @big_endian ? data.unpack("N") : data.unpack("V")
+                (@big_endian ? data.unpack("N") : data.unpack("V")).pop
               when 2
-                @big_endian ? data.unpack("n") : data.unpack("v")
+                (@big_endian ? data.unpack("n") : data.unpack("v")).pop
             end
           when cast_to == Float
-            @big_endian ? data.unpack("g") : data.unpack("f")
+           (@big_endian ? data.unpack("g") : data.unpack("f")).pop
           else
             raise "Ooops - dunno how to cast #{cast_to}"
         end

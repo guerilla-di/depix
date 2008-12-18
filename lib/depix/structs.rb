@@ -127,7 +127,17 @@ module Depix; module Structs
     [:pixels_per_line, Integer, UINT],
     [:lines_per_element, Integer, UINT],
     
-    [:image_element, String, struct_size(IMAGE_ELEMENT) * 8],
+    
+    [:image_element1, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element2, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element3, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element4, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element5, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element6, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element7, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    [:image_element8, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
+    
+
     [:reserve, String, 52],
   ]
   
