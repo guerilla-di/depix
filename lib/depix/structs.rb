@@ -171,7 +171,7 @@ module Depix; module Structs
   ]
   
   TELEVISION_INFO = [
-    [:time_code, Integer, UINT],
+    [:time_code, Timecode, UINT],
     [:user_bits, Integer, UINT],
     
     [:interlace, String, UCHAR],

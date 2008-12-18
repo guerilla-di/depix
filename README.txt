@@ -9,8 +9,8 @@ Read DPX file metadata
 
 == SYNOPSIS:
 
-  meta = Depix::Metadata.from_file(dpx_file_path)
-  puts meta.smpte_source_tc #=> 10:00:00:02
+  meta = Depix::Reader.new.from_file(dpx_file_path)
+  puts meta.television.time_code #=> 10:00:00:02
   
 == REQUIREMENTS:
 
