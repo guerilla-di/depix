@@ -57,7 +57,7 @@ module Depix; module Structs
   }
   
   FILE_INFO = [
-    [:magic, Integer, UINT],
+    [:magic, String, 4],
     [:image_offset, Integer, UINT],
     
     [:version, String, 8],

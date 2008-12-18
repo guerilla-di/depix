@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/depix/structs'
 require 'stringio'
 require 'rubygems'
-require 'timecode'
+#require 'timecode'
 
 module Depix
   VERSION = '1.0.0'
@@ -28,8 +28,9 @@ module Depix
         if element.size == 3
           key, cast, size = element
           parsed[key] = process_cast(cast, io, size, key)
-          puts "#{key}=#{parsed[key]} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
-        
+          puts "#{key}=#{parsed[key].inspect} - #{cast} (#{size})" unless parsed[key].is_a?(Meta)
+
+          @big_endian = (parsed[key] == "SDPX") if element[0] == :magic
         elsif element.size == 2
           # skip for now
         end
@@ -45,11 +46,16 @@ module Depix
         data = io.read(chunk_size)
         case true
           when cast_to == String
-            data.unpack("A*").pop
+            unpad(data.unpack("A*").pop)
           when cast_to == Integer
-            data.unpack("A*").pop.unpack("I*")
+            case chunk_size
+            when 4
+              @big_endian ? data.unpack("N") : data.unpack("V")
+            when 2
+              @big_endian ? data.unpack("n") : data.unpack("v")
+            end
           when cast_to == Float
-            data.unpack("f")
+            @big_endian ? data.unpack("g") : data.unpack("f")
           else
             raise "Ooops - dunno how to cast #{cast_to}"
         end
@@ -58,12 +64,12 @@ module Depix
   
     def unpad(string)
       #string.gsub(/(\377+)/, ' ').gsub(/(\000+)/, ' ').strip
-      string
+      string.gsub("\000", '').gsub(0xFF.chr, '')
     end
   end
 end
 
 
 if __FILE__ == $0
-  Depix::Reader.new.read_from_file('/Code/tools/ruby_libs/depix/test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx')
+  Depix::Reader.new.read_from_file(File.dirname(__FILE__)+"/../test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx")
 end
