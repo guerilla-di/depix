@@ -67,6 +67,9 @@ class EichTest < Test::Unit::TestCase
 end
 
 class ReaderTest < Test::Unit::TestCase
+  
+  SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
+  
   def test_nestify
     k, v = ["foo", "bar"], [1, 2]
     assert_equal( {"foo"=>1, "bar"=> 2}, Depix::Reader.nestify(k,v))
@@ -88,7 +91,7 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_parsed_properly
-    file = 'samples/E012_P001_L000002_lin.0001.dpx'
+    file = SAMPLE_DPX
     parsed = Depix::Reader.from_file(file)
     assert_equal "SDPX", parsed.file.magic
     assert_equal 8192, parsed.file.image_offset
@@ -121,7 +124,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 0, parsed.image.image_elements[0].end_of_line_padding
     assert_equal 0, parsed.image.image_elements[0].end_of_image_padding
     assert_equal "IMAGE DESCRIPTION DATA        P", parsed.image.image_elements[0].description
-  #  assert_equal "E012x�", parsed.orientation.device
+  #  assert_equal "E012x�", parsed.orientation.device - this is where Flame writes the reel
     assert_equal 853, parsed.orientation.aspect_ratio[0]
     assert_equal 640, parsed.orientation.aspect_ratio[1]
 
@@ -141,7 +144,7 @@ class ReaderTest < Test::Unit::TestCase
   def test_syntethics
     assert_nothing_raised { Depix::Synthetics }
 
-    file = 'samples/E012_P001_L000002_lin.0001.dpx'
+    file = SAMPLE_DPX
     parsed = Depix::Reader.from_file(file)
     assert_equal "75 00 19 740612 9841", parsed.keycode
     assert_equal :RGB, parsed.component_type
