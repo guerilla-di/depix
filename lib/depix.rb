@@ -77,11 +77,7 @@ module Depix
     end
     
     def from_string(str) #:nodoc:
-      result = wrap(deep_parse(str, Structs::DPX_INFO))
-      class << result
-        include Synthetics
-      end
-      result
+      wrap(deep_parse(str, Structs::DPX_INFO))
     end
     
     def deep_parse(data, structure)
@@ -107,7 +103,9 @@ module Depix
     end
     
     def wrap(result)
-      self.class.nestify(Structs::TEMPLATE_KEYS, result)
+      eich = self.class.nestify(Structs::TEMPLATE_KEYS, result)
+      class << eich; include Synthetics; end
+      eich
     end
     
     # FIXME - currently no array handling

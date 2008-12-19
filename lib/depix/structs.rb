@@ -51,7 +51,7 @@ module Depix
   #:stopdoc: 
   
   # To avoid fucking up with sizes afterwards
-  UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
+  U32, R32, U16, U8, UCHAR = 4, 4, 2, 1, 1
   
   def self.struct_size(struct_const) #:nodoc:
     struct_const.inject(0){| s, e | s + e[2]}
@@ -63,15 +63,15 @@ module Depix
   
   FILE_INFO = Struct[
     [:magic, String, 4],
-    [:image_offset, Integer, UINT],
+    [:image_offset, Integer, U32],
     
     [:version, String, 8],
     
-    [:file_size, Integer, UINT],
-    [:ditto_key, Integer, UINT],
-    [:generic_size, Integer, UINT],
-    [:industry_size, Integer, UINT],
-    [:user_size, Integer, UINT],
+    [:file_size, Integer, U32],
+    [:ditto_key, Integer, U32],
+    [:generic_size, Integer, U32],
+    [:industry_size, Integer, U32],
+    [:user_size, Integer, U32],
     
     [:filename, String, 100],
     [:timestamp, String, 24],
@@ -79,7 +79,7 @@ module Depix
     [:project, String, 200],
     [:copyright, String, 200],
     
-    [:encrypt_key, Integer, UINT],
+    [:encrypt_key, Integer, U32],
     [:reserve, String, 104],
   ]
 
@@ -91,12 +91,12 @@ module Depix
       [:count, String, 4],
       [:format, String, 32],
       
-      [:frame_position, Integer, UINT],
-      [:sequence_extent, Integer, UINT],
-      [:held_count, Integer, UINT],
+      [:frame_position, Integer, U32],
+      [:sequence_extent, Integer, U32],
+      [:held_count, Integer, U32],
     
-      [:frame_rate, Float, FLOAT],
-      [:shutter_angle, Float, FLOAT],
+      [:frame_rate, Float, R32],
+      [:shutter_angle, Float, R32],
       
       [:frame_id, String, 32],
       [:slate, String, 100],
@@ -105,57 +105,57 @@ module Depix
   
 
   IMAGE_ELEMENT = Struct[
-     [:data_sign, Integer, UINT],
-     [:low_data, Integer, UINT],
-     [:low_quantity, Float, FLOAT],
-     [:high_data, Integer, UINT],
-     [:high_quantity, Float, FLOAT],
+     [:data_sign, Integer, U32],
+     [:low_data, Integer, U32],
+     [:low_quantity, Float, R32],
+     [:high_data, Integer, U32],
+     [:high_quantity, Float, R32],
      
      # TODO: Autoreplace with enum values. Note: with these we will likely be addressing the enums
-     [:descriptor, String, UCHAR],
-     [:transfer, String, UCHAR],
-     [:colorimetric, String, UCHAR],
-     [:bit_size, String, UCHAR],
+     [:descriptor, Integer, U8],
+     [:transfer, Integer, U8],
+     [:colorimetric, Integer, U8],
+     [:bit_size, Integer, U8],
      
-     [:packing, Integer, USHORT],
-     [:encoding, Integer, USHORT],
-     [:data_offset, Integer, UINT],
-     [:end_of_line_padding, Integer, UINT],
-     [:end_of_image_padding, Integer, UINT],
+     [:packing, Integer, U16],
+     [:encoding, Integer, U16],
+     [:data_offset, Integer, U32],
+     [:end_of_line_padding, Integer, U32],
+     [:end_of_image_padding, Integer, U32],
      [:description, String, 32],
   ]
   
   IMAGE_ELEMENTS = (0..7).map{|e| [e, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)] }
   
   IMAGE_INFO = Struct[
-    [:orientation, Integer, USHORT],
-    [:number_elements, Integer, USHORT],
+    [:orientation, Integer, U16],
+    [:number_elements, Integer, U16],
     
-    [:pixels_per_line, Integer, UINT],
-    [:lines_per_element, Integer, UINT],
+    [:pixels_per_line, Integer, U32],
+    [:lines_per_element, Integer, U32],
     
     [:image_elements, IMAGE_ELEMENTS, struct_size(IMAGE_ELEMENTS) ],
 
     [:reserve, String, 52],
   ]
   
-  BORDER = (0..3).map{|s| [s, Integer, USHORT] }
+  BORDER = (0..3).map{|s| [s, Integer, U16] }
 
   ASPECT_RATIO = [
-    [0, Integer, UINT],
-    [1, Integer, UINT],
+    [0, Integer, U32],
+    [1, Integer, U32],
   ]
   
   ORIENTATION_INFO = Struct[
   
-    [:x_offset, Integer, UINT],
-    [:y_offset, Integer, UINT],
+    [:x_offset, Integer, U32],
+    [:y_offset, Integer, U32],
     
-    [:x_center, Float, FLOAT],
-    [:y_center, Float, FLOAT],
+    [:x_center, Float, R32],
+    [:y_center, Float, R32],
     
-    [:x_size, Integer, UINT],
-    [:y_size, Integer, UINT],
+    [:x_size, Integer, U32],
+    [:y_size, Integer, U32],
     
     [:filename, String, 100],
     [:timestamp, String, 24],
@@ -169,30 +169,30 @@ module Depix
   ]
   
   TELEVISION_INFO = Struct[
-    [:time_code, Integer, UINT],
-    [:user_bits, Integer, UINT],
+    [:time_code, Integer, U32],
+    [:user_bits, Integer, U32],
     
-    [:interlace, String, UCHAR],
-    [:field_number, String, UCHAR],
-    [:video_signal, String, UCHAR],
-    [:padding, String, UCHAR],
+    [:interlace, Integer, U8],
+    [:field_number, Integer, U8],
+    [:video_signal, Integer, U8],
+    [:padding, Integer, U8],
     
-    [:horizontal_sample_rate, Float, FLOAT],
-    [:vertical_sample_rate, Float, FLOAT],
-    [:frame_rate, Float, FLOAT],
-    [:time_offset, Float, FLOAT],
-    [:gamma, Float, FLOAT],
-    [:black_level, Float, FLOAT],
-    [:black_gain, Float, FLOAT],
-    [:break_point, Float, FLOAT],
-    [:white_level, Float, FLOAT],
-    [:integration_times, Float, FLOAT],
+    [:horizontal_sample_rate, Float, R32],
+    [:vertical_sample_rate, Float, R32],
+    [:frame_rate, Float, R32],
+    [:time_offset, Float, R32],
+    [:gamma, Float, R32],
+    [:black_level, Float, R32],
+    [:black_gain, Float, R32],
+    [:break_point, Float, R32],
+    [:white_level, Float, R32],
+    [:integration_times, Float, R32],
     [:reserve, String, 76],
   ]
   
   USER_INFO = Struct[
     [:id, String, 32],
-    [:user_data, Integer, UINT],
+    [:user_data, Integer, U32],
   ]
   
   DPX_INFO = Struct[
@@ -238,7 +238,9 @@ module Depix
   end
   
   def self.integer_template(size, big_endian) #:nodoc:
-    if size == 2
+    if size == 1
+      big_endian ? "c" : "c"
+    elsif size == 2
       big_endian ? "n" : "v"
     elsif size == 4
       big_endian ? "N" : "V"
