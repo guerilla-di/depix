@@ -7,8 +7,10 @@ require File.dirname(__FILE__) + '/depix/structs'
 module Depix
   VERSION = '1.0.1'
   
-  BLANK_4 = 0xFFFFFFFF #:nodoc:
   BLANK_2 = 0xFFFF #:nodoc:
+  BLANK_4 = 0xFFFFFFFF #:nodoc:
+  BLANK_F = 0xFFFFFFFF #:nodoc:
+  BLANK_CHAR = 0xFF #:nodoc:
   
   # Methodic hash - stolen from Camping
   class H < Hash
@@ -129,20 +131,7 @@ module Depix
     end
     
     def unpad(string) # :nodoc:
-      string.gsub(0xFF.chr, '').gsub(0xFF.chr, '')
-    end
-    
-    TIME_FIELDS = 7 # :nodoc:
-
-    def uint_to_tc(timestamp)  # :nodoc:
-      shift = 4 * TIME_FIELDS;
-      tc_elements = (0..TIME_FIELDS).map do 
-        part = ((timestamp >> shift) & 0x0F)
-        shift -= 4
-        part
-      end.join.scan(/(\d{2})/).flatten.map{|e| e.to_i}
-      
-      Timecode.at(*tc_elements)
+      string.gsub("\000", '').gsub(0xFF.chr, '')
     end
     
     #:startdoc:
