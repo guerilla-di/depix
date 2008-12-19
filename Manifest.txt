@@ -1,7 +1,14 @@
 History.txt
 Manifest.txt
 README.txt
+DPX_HEADER_STRUCTURE.txt
 Rakefile
-bin/depix
+bin/depix-inform
 lib/depix.rb
+lib/depix/struct_explainer.rb
+lib/depix/structs.rb
 test/test_depix.rb
+test/samples/E012_P001_L000002_lin.0001.dpx
+test/samples/E012_P001_L000002_lin.0002.dpx
+test/samples/E012_P001_L000002_log.0001.dpx
+test/samples/E012_P001_L000002_log.0002.dpx

@@ -6,12 +6,19 @@
 
 Read DPX file metadata
 
-
 == SYNOPSIS:
 
   meta = Depix::Reader.new.from_file(dpx_file_path)
   puts meta.television.time_code #=> 10:00:00:02
   
+The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. The structs
+used for actual parsing are in the Depix::Structs module (but in a much less readable form, obviously)
+
+== NOTES:
+
+The reader tries to be efficient - fast Ruby unpacking is used, some shortcuts are taken. Also don't worry - we do not need to read
+the whole DPX file (which usually is around 8mb per frame) to know the details
+
 == REQUIREMENTS:
 
 * timecode gem (sudo gem install timecode)

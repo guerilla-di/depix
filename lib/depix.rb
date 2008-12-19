@@ -21,72 +21,53 @@ module Depix
     end
     undef id, type
   end
-
   
+  # Reads the metadata
   class Reader
+
+    # Read the header from file (no worries, only the needed number of bytes will be read into memory). Returns a H with the metadata.
     def from_file(path)
-      header = File.open(path, 'r') { |f| f.read(Structs.struct_size(Structs::DPX_INFO)) }
-      result = deep_parse(StringIO.new(header), Structs::DPX_INFO)
-    end
-  
-    private
-  
-    def deep_parse(io, structure)
-      parsed = {}
-      structure.each do | element |
-        if element.size == 3
-          key, cast, size = element
-          parsed[key] = process_cast(cast, io, size, key)
-          # debug "Parsed #{key}=#{parsed[key]} (#{cast} #{size})" unless parsed[key].is_a?(H)
-         
-          # Catch LE-BE
-          @big_endian = (parsed[key] == "SDPX") if element[0] == :magic
-        elsif element.size == 2
-          # skip for now
-        end
-      end
-      H[parsed]
-    end
-  
-    def debug(str)
-      puts str
+      header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
+      deep_parse(header, Structs::DPX_INFO)
     end
     
-    def process_cast(cast_to, io, chunk_size, key)
-      # Nested structs get rerouted to deep_parse
-      if cast_to.is_a?(Array)
-        deep_parse(io, cast_to)
-      else # simple types
-        data = io.read(chunk_size)
-        case true
-          when cast_to == String
-            unpad(data.unpack("A*").pop)
-          when cast_to == Integer
-            case chunk_size
-              when 4
-                v = (@big_endian ? data.unpack("N") : data.unpack("V")).pop
-                v == BLANK_4 ? nil : v
-              when 2
-                v = (@big_endian ? data.unpack("n") : data.unpack("v")).pop
-                v == BLANK_2 ? nil : v
-            end
-          when cast_to == Float
-            v = (@big_endian ? data.unpack("g") : data.unpack("f")).pop
-            v.nan? ? nil : v
-          when cast_to == Timecode
-            int = (@big_endian ? data.unpack("N") : data.unpack("V")).pop
-            uint_to_tc(int)
+    # Read the metadata from an in-memory string. Returns a H with the metadata.
+    def from_string(str)
+      deep_parse(str, Structs::DPX_INFO)
+    end
+    
+    private
+  
+    def deep_parse(data, structure)
+      magic = data[0..3]
+      template = (magic == "SDPX") ? Structs::TEMPLATE_BE : Structs::TEMPLATE_LE
+      
+      result = data.unpack(template).map do |e| 
+        case e
+          when String
+            clean = unpad(e)
+            clean.empty? ? nil : clean
+          when Integer
+            (e == BLANK_2 || e == BLANK_4) ? nil : e
+          when Float
+            e.nan? ? nil : e
         end
       end
+      
+      
+      H[*Structs::TEMPLATE_KEYS.zip(result).flatten]
+      
     end
   
-    def unpad(string)
+    private 
+    
+    def unpad(string) # :nodoc:
       string.gsub(0xFF.chr, '').gsub(0xFF.chr, '')
     end
     
-    TIME_FIELDS = 7
+    TIME_FIELDS = 7 # :nodoc:
 
-    def uint_to_tc(timestamp)
+    def uint_to_tc(timestamp)  # :nodoc:
       shift = 4 * TIME_FIELDS;
       tc_elements = (0..TIME_FIELDS).map do 
         part = ((timestamp >> shift) & 0x0F)
@@ -101,9 +82,6 @@ end
 
 
 if __FILE__ == $0
-  require 'benchmark'
-# puts Benchmark.measure {
-#   45000.times { Depix::Reader.new.from_file(File.dirname(__FILE__)+"/../test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx") }
-# }
-  res = Depix::Reader.new.from_file(File.dirname(__FILE__)+"/../test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx")
+ require 'benchmark'
+  puts Depix::Reader.new.from_file(File.dirname(__FILE__)+"/../test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx").inspect
 end

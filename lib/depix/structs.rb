@@ -1,16 +1,19 @@
-# Basically a copy of http://trac.imagemagick.org/browser/ImageMagick/trunk/coders/dpx.c
-# Which is a reformulation of http://www.cineon.com/ff_draft.php
-# Which is a preamble to some SMPTE crap that you have to buy for 14 bucks.
-#
-# It's very fragile - in the world of C, everything is fixed length. If Tolstoy wanted to write
-# "War and Peace" in C he would need to know the number of letters ahead. It has good and bad
-# qualities - the good ones being computers go faster like that. The rest are bad parts.
-module Depix; module Structs
+module Depix
+  # Basically a copy of http://trac.imagemagick.org/browser/ImageMagick/trunk/coders/dpx.c
+  #
+  # Which is a reformulation of http://www.cineon.com/ff_draft.php
+  #
+  # Which is a preamble to some SMPTE crap that you have to buy for 14 bucks. Or download from http://www.cinesite.com/static/scanning/techdocs/dpx_spec.pdf
+  #
+  # It's very fragile - in the world of C, everything is fixed length. If Tolstoy wanted to write
+  # "War and Peace" in C he would need to know the number of letters ahead. It has good and bad
+  # qualities - the good ones being computers go faster like that. The rest are bad parts.
+  module Structs
   
   # To avoid fucking up with sizes afterwards
   UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
   
-  def self.struct_size(struct_const) #:nodoc
+  def self.struct_size(struct_const) #:nodoc:
     struct_const.inject(0){| s, e | s + e[-1]}
   end
   
@@ -171,7 +174,7 @@ module Depix; module Structs
   ]
   
   TELEVISION_INFO = [
-    [:time_code, Timecode, UINT],
+    [:time_code, Integer, UINT],
     [:user_bits, Integer, UINT],
     
     [:interlace, String, UCHAR],
@@ -206,4 +209,45 @@ module Depix; module Structs
     [:user, USER_INFO, struct_size(USER_INFO)],
   ]
   
-end ;end
+  # Converts the nexted structs to one template that can be fed to Ruby pack/unpack. This yields
+  # some impressive performance improvements (about 1.4 times faster) over reading fields bytewise
+  def self.struct_to_template(struct, big_endian)
+    keys, template = [], ''
+    struct.each do | elem |
+      key, cast, size = elem
+      pattern = case true
+        when cast.is_a?(Array)
+          inner_keys, inner_template = struct_to_template(cast, big_endian)
+          keys += inner_keys.map{|k| [key, k].join('_') }
+          inner_template
+        when cast == Integer || cast == Timecode
+          keys << key.to_s
+          integer_template(size, big_endian)
+        when cast == String
+          keys << key.to_s
+          "A#{size}"
+        when cast == Float
+          keys << key.to_s
+          big_endian ? "g" : "f"
+      end
+      
+      template << pattern
+    end
+    [keys, template]
+  end
+  
+  def self.integer_template(size, big_endian) #:nodoc:
+    if size == 2
+      big_endian ? "n" : "v"
+    elsif size == 4
+      big_endian ? "N" : "V"
+    end
+  end
+  
+  # Shortcuts used to speed up parsing
+  TEMPLATE_KEYS, TEMPLATE_BE = struct_to_template(DPX_INFO, true)
+  TEMPLATE_LE = struct_to_template(DPX_INFO, false)
+  TEMPLATE_LENGTH = struct_size(DPX_INFO)
+  
+  end
+end
