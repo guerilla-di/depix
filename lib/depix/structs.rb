@@ -4,10 +4,6 @@ module Depix
   # Which is a reformulation of http://www.cineon.com/ff_draft.php
   #
   # Which is a preamble to some SMPTE crap that you have to buy for 14 bucks. Or download from http://www.cinesite.com/static/scanning/techdocs/dpx_spec.pdf
-  #
-  # It's very fragile - in the world of C, everything is fixed length. If Tolstoy wanted to write
-  # "War and Peace" in C he would need to know the number of letters ahead. It has good and bad
-  # qualities - the good ones being computers go faster like that. The rest are bad parts.
   module Structs
   
   COLORIMETRIC = {

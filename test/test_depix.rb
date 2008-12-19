@@ -56,6 +56,16 @@ class StructsTest < Test::Unit::TestCase
   end
 end
 
+class EichTest < Test::Unit::TestCase
+  def test_eich
+    eich = Depix::H.new
+    assert_not_nil eich.foo = 1
+    assert_nothing_raised { eich.foo }
+    assert_equal ['foo'], eich.keys
+    assert_equal 1, eich.foo
+  end
+end
+
 class ReaderTest < Test::Unit::TestCase
   def test_nestify
     k, v = ["foo", "bar"], [1, 2]
@@ -81,7 +91,18 @@ class ReaderTest < Test::Unit::TestCase
     file = 'samples/E012_P001_L000002_lin.0001.dpx'
     parsed = Depix::Reader.from_file(file)
     assert_equal 'SDPX', parsed.file.magic
-    assert_equal 320, image.pixels_per_line
-    assert_equal 240, image.lines_per_element
+    assert_equal 320, parsed.image.pixels_per_line
+    assert_equal 240, parsed.image.lines_per_element
+    assert_equal 25.0, parsed.film.frame_rate
+    assert_equal 2, parsed.film.sequence_extent
+  end
+  
+  def test_syntethics
+    assert_nothing_raised { Depix::Synthetics }
+
+    file = 'samples/E012_P001_L000002_lin.0001.dpx'
+    parsed = Depix::Reader.from_file(file)
+    assert_equal "E012", parsed.flame_reel
+    assert_equal "75 00 19 740612 9841", parsed.keycode
   end
 end

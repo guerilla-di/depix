@@ -19,9 +19,25 @@ module Depix
     #   => :macadamian
     #
     def method_missing(m,*a)
-        m.to_s=~/=$/?self[$`]=a[0]:a==[]? (self.key?(m.to_sym) ? self[m.to_sym] : super ) : super
+        m.to_s=~/=$/ ? (self[$`] = a[0]) : (a == [] ? (self.key?(m.to_s) ? self[m.to_s] : super ) : super)
     end
     undef id, type
+  end
+  
+  # Offers convenience access to a few common attributes bypassing the piecemeal structs
+  module Synthetics
+    def keycode
+      [film.id, film.type, film.offset, film.prefix, film.count].compact.join(' ')
+    end
+    
+    def flame_reel
+      orientation.device.to_s.scan(/^(\w+)/).to_s
+    end
+    
+    def time_code
+      Timecode.from_uint(television.time_code, film.fps)
+    end
+    
   end
   
   # Reads the metadata
@@ -38,12 +54,14 @@ module Depix
         new.from_string(str)
       end
       
+      # Returns a printable report on all the headers present in the string
       def describe_string(str)
         reader = new
         result = reader.deep_parse(str, Structs::DPX_INFO)
         reader.inform(result)
       end
-      
+
+      # Returns a printable report on all the headers present in the file at the path passed
       def describe_file(path)
         header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
         describe_string(header)
@@ -57,7 +75,11 @@ module Depix
     end
     
     def from_string(str) #:nodoc:
-      wrap(deep_parse(str, Structs::DPX_INFO))
+      result = wrap(deep_parse(str, Structs::DPX_INFO))
+      class << result
+        include Synthetics
+      end
+      result
     end
     
     def deep_parse(data, structure)
@@ -86,6 +108,7 @@ module Depix
       self.class.nestify(Structs::TEMPLATE_KEYS, result)
     end
     
+    # FIXME - currently no array handling
     def self.nestify(keys, values)
       auto_hash = H.new do |h,k| 
         h[k] = H.new(&h.default_proc)
@@ -121,5 +144,7 @@ module Depix
       
       Timecode.at(*tc_elements)
     end
+    
+    #:startdoc:
   end
 end
