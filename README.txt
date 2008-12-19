@@ -1,6 +1,6 @@
 = depix
 
-* FIX (url)
+* http://rubyforge.org/julik/depix
 
 == DESCRIPTION:
 

@@ -28,119 +28,7 @@ and method name
   * <tt>number_elements</tt> Integer
   * <tt>pixels_per_line</tt> Integer
   * <tt>lines_per_element</tt> Integer
-  * <tt>image_element1</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element2</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element3</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element4</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element5</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element6</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element7</tt> hash of
-    * <tt>data_sign</tt> Integer
-    * <tt>low_data</tt> Integer
-    * <tt>low_quantity</tt> Float
-    * <tt>high_data</tt> Integer
-    * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
-    * <tt>packing</tt> Integer
-    * <tt>encoding</tt> Integer
-    * <tt>data_offset</tt> Integer
-    * <tt>end_of_line_padding</tt> Integer
-    * <tt>end_of_image_padding</tt> Integer
-    * <tt>description</tt> String
-  * <tt>image_element8</tt> hash of
+  * <tt>image_elements</tt>  (array , 8 members):
     * <tt>data_sign</tt> Integer
     * <tt>low_data</tt> Integer
     * <tt>low_quantity</tt> Float
@@ -168,14 +56,10 @@ and method name
   * <tt>timestamp</tt> String
   * <tt>device</tt> String
   * <tt>serial</tt> String
-  * <tt>border</tt> hash of
-    * <tt>XL</tt> Integer
-    * <tt>XR</tt> Integer
-    * <tt>YT</tt> Integer
-    * <tt>YB</tt> Integer
-  * <tt>aspect_ratio</tt> hash of
-    * <tt>h</tt> Integer
-    * <tt>v</tt> Integer
+  * <tt>border</tt>  (array , 4 members):
+  * <tt></tt> Integer
+  * <tt>aspect_ratio</tt>  (array , 2 members):
+  * <tt></tt> Integer
   * <tt>reserve</tt> String
 * <tt>film</tt> hash of
   * <tt>id</tt> String

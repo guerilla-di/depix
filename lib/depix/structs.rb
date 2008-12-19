@@ -14,8 +14,11 @@ module Depix
   UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
   
   def self.struct_size(struct_const) #:nodoc:
-    struct_const.inject(0){| s, e | s + e[-1]}
+    struct_const.inject(0){| s, e | s + e[2]}
   end
+  
+  # Used to distinguish structs from repeated values
+  class Struct < Array; end #:nodoc:
   
   COLORIMETRIC = {
       :UserDefined => 0,
@@ -59,7 +62,7 @@ module Depix
     :UserDef8Element => 156,
   }
   
-  FILE_INFO = [
+  FILE_INFO = Struct[
     [:magic, String, 4],
     [:image_offset, Integer, UINT],
     
@@ -81,7 +84,7 @@ module Depix
     [:reserve, String, 104],
   ]
 
-  FILM_INFO = [
+  FILM_INFO = Struct[
       [:id, String, 2],
       [:type, String, 2],
       [:offset, String, 2],
@@ -102,7 +105,7 @@ module Depix
   ]
   
 
-  IMAGE_ELEMENT = [
+  IMAGE_ELEMENT = Struct[
      [:data_sign, Integer, UINT],
      [:low_data, Integer, UINT],
      [:low_quantity, Float, FLOAT],
@@ -123,35 +126,28 @@ module Depix
      [:description, String, 32],
   ]
   
-  IMAGE_INFO = [
+  IMAGE_ELEMENTS = (0..7).map{|e| [e, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)] }
+  
+  IMAGE_INFO = Struct[
     [:orientation, Integer, USHORT],
     [:number_elements, Integer, USHORT],
     
     [:pixels_per_line, Integer, UINT],
     [:lines_per_element, Integer, UINT],
     
-    
-    [:image_element1, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element2, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element3, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element4, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element5, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element6, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element7, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    [:image_element8, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)],
-    
+    [:image_elements, IMAGE_ELEMENTS, struct_size(IMAGE_ELEMENTS) ],
 
     [:reserve, String, 52],
   ]
   
-  BORDER = [:XL, :XR, :YT, :YB].map{|s| [s, Integer, USHORT] }
+  BORDER = (0..3).map{|s| [s, Integer, USHORT] }
 
   ASPECT_RATIO = [
-    [:h, Integer, UINT],
-    [:v, Integer, UINT],
+    [0, Integer, UINT],
+    [1, Integer, UINT],
   ]
   
-  ORIENTATION_INFO = [
+  ORIENTATION_INFO = Struct[
   
     [:x_offset, Integer, UINT],
     [:y_offset, Integer, UINT],
@@ -173,7 +169,7 @@ module Depix
     [:reserve, String, 28],
   ]
   
-  TELEVISION_INFO = [
+  TELEVISION_INFO = Struct[
     [:time_code, Integer, UINT],
     [:user_bits, Integer, UINT],
     
@@ -195,12 +191,12 @@ module Depix
     [:reserve, String, 76],
   ]
   
-  USER_INFO = [
+  USER_INFO = Struct[
     [:id, String, 32],
     [:user_data, Integer, UINT],
   ]
   
-  DPX_INFO = [
+  DPX_INFO = Struct[
     [:file, FILE_INFO, struct_size(FILE_INFO)],
     [:image, IMAGE_INFO, struct_size(IMAGE_INFO)],
     [:orientation, ORIENTATION_INFO, struct_size(ORIENTATION_INFO)],
@@ -216,9 +212,15 @@ module Depix
     struct.each do | elem |
       key, cast, size = elem
       pattern = case true
-        when cast.is_a?(Array)
+        when cast.is_a?(Struct) # Nested structs
           inner_keys, inner_template = struct_to_template(cast, big_endian)
-          keys += inner_keys.map{|k| [key, k].join('_') }
+          # Use a dot as a divider. We will detect it later on and merge into nested hashes
+          keys += inner_keys.map{|k| [key, k].join('.') }
+          inner_template
+        when cast.is_a?(Array) # Repeat values
+          inner_keys, inner_template = struct_to_template(cast, big_endian)
+          # Use a dot as a divider. We will detect it later on and merge into nested hashes
+          keys += inner_keys.map{|k| [key, k].join('.') }
           inner_template
         when cast == Integer || cast == Timecode
           keys << key.to_s

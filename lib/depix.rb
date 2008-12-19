@@ -54,12 +54,33 @@ module Depix
         end
       end
       
+      if true # debug
+        Structs::TEMPLATE_KEYS.zip(result).each{|k, v| puts "Parsed #{k}:#{v}" unless v.nil? }
+      end
       
-      H[*Structs::TEMPLATE_KEYS.zip(result).flatten]
-      
+      self.class.nestify(Structs::TEMPLATE_KEYS, result)
     end
   
     private 
+    
+    def self.nestify(keys, values)
+      auto_hash = H.new do |h,k| 
+        h[k] = H.new(&h.default_proc)
+      end
+      
+      keys.each_with_index do |path, idx |
+        value = values[idx]
+        
+        sub, elems = auto_hash, path.split('.')
+        while elems.any?
+          dir = elems.shift
+          dir = dir.to_i if dir =~ /^(\d+)$/
+          elems.any? ? (sub = sub[dir]) : (sub[dir] = value)
+        end
+      end
+      
+      auto_hash
+    end
     
     def unpad(string) # :nodoc:
       string.gsub(0xFF.chr, '').gsub(0xFF.chr, '')
@@ -78,10 +99,4 @@ module Depix
       Timecode.at(*tc_elements)
     end
   end
-end
-
-
-if __FILE__ == $0
- require 'benchmark'
-  puts Depix::Reader.new.from_file(File.dirname(__FILE__)+"/../test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx").inspect
 end
