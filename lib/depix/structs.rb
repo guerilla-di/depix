@@ -10,16 +10,6 @@ module Depix
   # qualities - the good ones being computers go faster like that. The rest are bad parts.
   module Structs
   
-  # To avoid fucking up with sizes afterwards
-  UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
-  
-  def self.struct_size(struct_const) #:nodoc:
-    struct_const.inject(0){| s, e | s + e[2]}
-  end
-  
-  # Used to distinguish structs from repeated values
-  class Struct < Array; end #:nodoc:
-  
   COLORIMETRIC = {
       :UserDefined => 0,
       :PrintingDensity => 1,
@@ -61,6 +51,19 @@ module Depix
     :UserDef7Element => 155,
     :UserDef8Element => 156,
   }
+  
+  #:stopdoc: 
+  
+  # To avoid fucking up with sizes afterwards
+  UINT, FLOAT, USHORT, UCHAR = 4, 4, 2, 1
+  
+  def self.struct_size(struct_const) #:nodoc:
+    struct_const.inject(0){| s, e | s + e[2]}
+  end
+  
+  # Used to distinguish structs from repeated values
+  class Struct < Array; end
+  
   
   FILE_INFO = Struct[
     [:magic, String, 4],
@@ -251,5 +254,6 @@ module Depix
   TEMPLATE_LE = struct_to_template(DPX_INFO, false)
   TEMPLATE_LENGTH = struct_size(DPX_INFO)
   
+  #:startdoc:
   end
 end

@@ -79,7 +79,7 @@ class ReaderTest < Test::Unit::TestCase
   
   def test_parse
     file = 'samples/E012_P001_L000002_lin.0001.dpx'
-    parsed = Depix::Reader.new.from_file(file)
+    parsed = Depix::Reader.from_file(file)
     assert_equal 'SDPX', parsed.file.magic
     assert_equal 320, image.pixels_per_line
     assert_equal 240, image.lines_per_element

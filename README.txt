@@ -14,6 +14,10 @@ Read DPX file metadata
 The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. The structs
 used for actual parsing are in the Depix::Structs module (but in a much less readable form, obviously)
 
+The gem also contains an executable called depix-desribe which can be used from the command line
+  
+  $book depix-describe 001_PTAPE_001.001.dpx
+
 == NOTES:
 
 The reader tries to be efficient - fast Ruby unpacking is used, some shortcuts are taken. Also don't worry - we do not need to read

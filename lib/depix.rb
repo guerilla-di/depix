@@ -24,20 +24,40 @@ module Depix
   
   # Reads the metadata
   class Reader
+    
+    class << self
+      # Read the header from file (no worries, only the needed number of bytes will be read into memory). Returns a H with the metadata.
+      def from_file(path)
+        new.from_file(path)
+      end
 
-    # Read the header from file (no worries, only the needed number of bytes will be read into memory). Returns a H with the metadata.
+      # Read the metadata from an in-memory string. Returns a H with the metadata.
+      def from_string(str)
+        new.from_string(str)
+      end
+      
+      def describe_string(str)
+        reader = new
+        result = reader.deep_parse(str, Structs::DPX_INFO)
+        reader.inform(result)
+      end
+      
+      def describe_file(path)
+        header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
+        describe_string(header)
+      end
+    end
+    
+    #:stopdoc:
     def from_file(path)
       header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
-      deep_parse(header, Structs::DPX_INFO)
+      from_string(header)
     end
     
-    # Read the metadata from an in-memory string. Returns a H with the metadata.
-    def from_string(str)
-      deep_parse(str, Structs::DPX_INFO)
+    def from_string(str) #:nodoc:
+      wrap(deep_parse(str, Structs::DPX_INFO))
     end
     
-    private
-  
     def deep_parse(data, structure)
       magic = data[0..3]
       template = (magic == "SDPX") ? Structs::TEMPLATE_BE : Structs::TEMPLATE_LE
@@ -53,15 +73,16 @@ module Depix
             e.nan? ? nil : e
         end
       end
-      
-      if true # debug
-        Structs::TEMPLATE_KEYS.zip(result).each{|k, v| puts "Parsed #{k}:#{v}" unless v.nil? }
-      end
-      
+      result
+    end
+    
+    def inform(result)
+      Structs::TEMPLATE_KEYS.zip(result).map{|k, v| "#{k}:#{v}" unless v.nil? }.compact.join("\n")
+    end
+    
+    def wrap(result)
       self.class.nestify(Structs::TEMPLATE_KEYS, result)
     end
-  
-    private 
     
     def self.nestify(keys, values)
       auto_hash = H.new do |h,k| 

@@ -57,6 +57,6 @@ eof
   def get_rdoc_for(struct)
     @io = StringIO.new
     explain_struct(Depix::Structs::DPX_INFO)
-    erb_template = TPL % @io.string
+    TPL % @io.string
   end
 end
