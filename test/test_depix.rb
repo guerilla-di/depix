@@ -59,7 +59,7 @@ end
 class EichTest < Test::Unit::TestCase
   def test_eich
     eich = Depix::H.new
-    assert_not_nil eich.foo = 1
+    assert_nothing_raised { assert_not_nil eich.foo = 1 }
     assert_nothing_raised { eich.foo }
     assert_equal ['foo'], eich.keys
     assert_equal 1, eich.foo
