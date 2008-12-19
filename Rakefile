@@ -3,7 +3,9 @@ require 'hoe'
 require './lib/depix.rb'
 
 Hoe.new('depix', Depix::VERSION) do |p|
-  p.developer('Julik Tarkhanov', 'me@julik.nl=')
+  p.developer('Julik Tarkhanov', 'me@julik.nl')
+  p.rubyforge_name = 'wiretap'
+  p.extra_deps.reject! {|e| e[0] == 'hoe' }
 end
 
 task :describe_structs do
