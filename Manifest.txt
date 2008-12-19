@@ -3,7 +3,7 @@ Manifest.txt
 README.txt
 DPX_HEADER_STRUCTURE.txt
 Rakefile
-bin/depix-inform
+bin/depix-describe
 lib/depix.rb
 lib/depix/struct_explainer.rb
 lib/depix/structs.rb
