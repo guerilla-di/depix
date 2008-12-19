@@ -143,7 +143,9 @@ class ReaderTest < Test::Unit::TestCase
 
     file = 'samples/E012_P001_L000002_lin.0001.dpx'
     parsed = Depix::Reader.from_file(file)
-    assert_equal "E012", parsed.flame_reel
     assert_equal "75 00 19 740612 9841", parsed.keycode
+    assert_equal :RGB, parsed.component_type
+    assert_equal :Linear, parsed.colorimetric
+    assert_equal "E012", parsed.flame_reel
   end
 end

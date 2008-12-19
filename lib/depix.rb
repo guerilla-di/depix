@@ -40,6 +40,16 @@ module Depix
       Timecode.from_uint(television.time_code, film.fps)
     end
     
+    # Get the name of the transfer function (Linear, Logarithmic, ...)
+    def colorimetric
+      Structs::COLORIMETRIC.invert[image.image_elements[0].colorimetric]
+    end
+    
+    # Get the name of the compnent type (RGB, YCbCr, ...)
+    def component_type
+      Structs::COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
+    end
+
   end
   
   # Reads the metadata

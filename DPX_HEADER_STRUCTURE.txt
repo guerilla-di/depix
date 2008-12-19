@@ -34,10 +34,10 @@ and method name
     * <tt>low_quantity</tt> Float
     * <tt>high_data</tt> Integer
     * <tt>high_quantity</tt> Float
-    * <tt>descriptor</tt> String
-    * <tt>transfer</tt> String
-    * <tt>colorimetric</tt> String
-    * <tt>bit_size</tt> String
+    * <tt>descriptor</tt> Integer
+    * <tt>transfer</tt> Integer
+    * <tt>colorimetric</tt> Integer
+    * <tt>bit_size</tt> Integer
     * <tt>packing</tt> Integer
     * <tt>encoding</tt> Integer
     * <tt>data_offset</tt> Integer
@@ -79,10 +79,10 @@ and method name
 * <tt>television</tt> hash of
   * <tt>time_code</tt> Integer
   * <tt>user_bits</tt> Integer
-  * <tt>interlace</tt> String
-  * <tt>field_number</tt> String
-  * <tt>video_signal</tt> String
-  * <tt>padding</tt> String
+  * <tt>interlace</tt> Integer
+  * <tt>field_number</tt> Integer
+  * <tt>video_signal</tt> Integer
+  * <tt>padding</tt> Integer
   * <tt>horizontal_sample_rate</tt> Float
   * <tt>vertical_sample_rate</tt> Float
   * <tt>frame_rate</tt> Float
