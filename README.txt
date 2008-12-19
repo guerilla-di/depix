@@ -8,7 +8,7 @@ Read DPX file metadata
 
 == SYNOPSIS:
 
-  meta = Depix::Reader.new.from_file(dpx_file_path)
+  meta = Depix::Reader.from_file(dpx_file_path)
   puts meta.television.time_code #=> 10:00:00:02
   
 The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. The structs
@@ -21,7 +21,11 @@ The gem also contains an executable called depix-desribe which can be used from 
 == NOTES:
 
 The reader tries to be efficient - fast Ruby unpacking is used, some shortcuts are taken. Also don't worry - we do not need to read
-the whole DPX file (which usually is around 8mb per frame) to know the details
+the whole DPX file (which usually is around 8mb per frame) to know the details.
+
+In the future there will be a possibility to modify and commit the headers, but it's not a priority at this time.
+
+Autodesk IFFS systems write the reel name for the file to the orientation.device field
 
 == REQUIREMENTS:
 
