@@ -5,8 +5,10 @@ require 'timecode'
 require File.dirname(__FILE__) + '/depix/structs'
 
 module Depix
-  VERSION = '1.0.0'
-  BLANK_4, BLANK_2 = 0xFFFFFFFF, 0xFFFF
+  VERSION = '1.0.1'
+  
+  BLANK_4 = 0xFFFFFFFF #:nodoc:
+  BLANK_2 = 0xFFFF #:nodoc:
   
   # Methodic hash - stolen from Camping
   class H < Hash

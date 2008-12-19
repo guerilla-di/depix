@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
 require File.dirname(__FILE__) + '/../lib/depix'
-ARGV.flatten.each do | file |
+if ARGV.flatten.map do | file |
   data = Depix::Reader.describe_file(file)
   puts "Describing DPX #{file}. Empty elements are omitted."
   puts data
+end.empty?
+  STDERR.puts "Usage: depix-describe somefile.dpx anotherfile.dpx"
 end
