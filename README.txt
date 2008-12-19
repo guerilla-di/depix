@@ -1,6 +1,6 @@
 = depix
 
-* http://rubyforge.org/julik/depix
+* http://wiretap.rubyforge.org/depix
 
 == DESCRIPTION:
 

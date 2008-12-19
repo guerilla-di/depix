@@ -6,6 +6,7 @@ Hoe.new('depix', Depix::VERSION) do |p|
   p.developer('Julik Tarkhanov', 'me@julik.nl')
   p.rubyforge_name = 'wiretap'
   p.extra_deps.reject! {|e| e[0] == 'hoe' }
+  p.remote_rdoc_dir = 'depix'
 end
 
 task :describe_structs do
