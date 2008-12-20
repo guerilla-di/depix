@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/structdef'
+require File.dirname(__FILE__) + '/dict'
 
 module Depix
   

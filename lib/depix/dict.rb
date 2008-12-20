@@ -63,19 +63,15 @@ module Depix
     end
   end
   
-  
-  class Dict
-    class << self
-      def fields
-        @fields ||= []
-      end
-    end
-  end
-  
   class Dict
     DEF_OPTS = { :req => false, :desc => nil }
     
     class << self
+      
+      def fields
+        @fields ||= []
+      end
+      
       def u32(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
@@ -123,6 +119,14 @@ module Depix
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_char( {:name => name, :length => count}.merge(opts) )
+      end
+      
+      def pattern
+        fields.map{|f| f.pattern }.join
+      end
+      
+      def length
+        fields.inject(0){|_, s| _ + s.length }
       end
       
       private

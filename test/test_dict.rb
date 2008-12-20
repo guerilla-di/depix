@@ -75,9 +75,10 @@ class TestArrayField < Test::Unit::TestCase
 end
 
 class TestInnerField < Test::Unit::TestCase
+
   include FieldConformity
   
-  def test_inner_field_conform_field!s_to_field_and_has_extra_methods
+  def test_inner_field_conforms_to_field_and_has_extra_methods
     f = InnerField.new
     conform_field!(f)
         
@@ -169,10 +170,23 @@ class TestDict < Test::Unit::TestCase
     end
   end
   
-  def test_dict_aggregates_its_template
+  def test_empty_dict_has_empty_template
     c = Class.new(Dict)
-    assert_equal '', c.template
+    assert_respond_to c, :pattern
+    assert_equal '', c.pattern
+    assert_equal 0, c.length
   end
+
+  def test_dict_assembles_template
+    c = Class.new(Dict)
+    c.fields << Field.emit_char
+    c.fields << Field.emit_char
+    
+    assert_respond_to c, :pattern
+    assert_equal 'C1C1', c.pattern
+    assert_equal 2, c.length
+  end
+  
 end
 
 
