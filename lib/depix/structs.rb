@@ -1,257 +1,136 @@
+require File.dirname(__FILE__) + '/dict'
+
 module Depix
-  # Basically a copy of http://trac.imagemagick.org/browser/ImageMagick/trunk/coders/dpx.c
-  #
-  # Which is a reformulation of http://www.cineon.com/ff_draft.php
-  #
-  # Which is a preamble to some SMPTE crap that you have to buy for 14 bucks. Or download from http://www.cinesite.com/static/scanning/techdocs/dpx_spec.pdf
-  module Structs
   
-  COLORIMETRIC = {
-      :UserDefined => 0,
-      :PrintingDensity => 1,
-      :Linear => 2,
-      :Logarithmic => 3,
-      :UnspecifiedVideo => 4,
-      :SMTPE_274M => 5,
-      :ITU_R709 => 6,
-      :ITU_R601_625L => 7,
-      :ITU_R601_525L => 8,
-      :NTSCCompositeVideo => 9,
-      :PALCompositeVideo => 10,
-      :ZDepthLinear => 11,
-      :DepthHomogeneous => 12
-  }
-  
-  COMPONENT_TYPE = {
-    :Undefined => 0,
-    :Red => 1,
-    :Green => 2,
-    :Blue => 3,
-    :Alpha => 4,
-    :Luma => 6,
-    :ColorDifferenceCbCr => 7,
-    :Depth => 8,
-    :CompositeVideo => 9,
-    :RGB => 50,
-    :RGBA => 51,
-    :ABGR => 52,
-    :CbYCrY422 => 100,
-    :CbYACrYA4224 => 101,
-    :CbYCr444 => 102,
-    :CbYCrA4444 => 103,
-    :UserDef2Element => 150,
-    :UserDef3Element => 151,
-    :UserDef4Element => 152,
-    :UserDef5Element => 153,
-    :UserDef6Element => 154,
-    :UserDef7Element => 155,
-    :UserDef8Element => 156,
-  }
-  
-  #:stopdoc: 
-  
-  # To avoid fucking up with sizes afterwards
-  U32, R32, U16, U8, UCHAR = 4, 4, 2, 1, 1
-  
-  def self.struct_size(struct_const) #:nodoc:
-    struct_const.inject(0){| s, e | s + e[2]}
+  class FileInfo < Dict
+    char :magic, 4,       :desc => 'Whether the file is BE', :req => true
+    u32  :image_offset,   :desc => 'Offset to image data in bytes', :req => true
+    char :version, 8,     :desc => 'Version of header format', :req => true
+    
+    u32  :file_size,      :desc => "Total image size in bytes", :req => true
+    u32  :ditto_key,      :desc => 'Whether headers change through the sequence'
+    u32  :generic_size,   :desc => 'Generic header length'
+    u32  :industry_size,  :desc => 'Industry header length'
+    u32  :user_size,      :desc => 'User header length'
+    
+    char :filename, 100,  :desc => 'Original filename'
+    char :timestamp, 24,  :desc => 'Creation 15'
+    char :creator, 100,   :desc => 'Creator application'
+    char :roject, 200,    :desc => 'Project name'
+    char :copyright, 200, :desc => 'Copyright'
+    
+    u32  :encrypt_key,    :desc => 'Encryption key'
+    char :reserve, 104
   end
   
-  # Used to distinguish structs from repeated values
-  class Struct < Array; end
-  
-  
-  FILE_INFO = Struct[
-    [:magic, String, 4],
-    [:image_offset, Integer, U32],
-    
-    [:version, String, 8],
-    
-    [:file_size, Integer, U32],
-    [:ditto_key, Integer, U32],
-    [:generic_size, Integer, U32],
-    [:industry_size, Integer, U32],
-    [:user_size, Integer, U32],
-    
-    [:filename, String, 100],
-    [:timestamp, String, 24],
-    [:creator, String, 100],
-    [:project, String, 200],
-    [:copyright, String, 200],
-    
-    [:encrypt_key, Integer, U32],
-    [:reserve, String, 104],
-  ]
+  class FilmInfo < Dict
+    char :id, 2,          :desc => 'Film mfg. ID code (2 digits from film edge code)'
+    char :type, 2,        :desc => 'Film type (2 digits from film edge code)'
+    char :offset, 2,      :desc => 'Offset in perfs (2 digits from film edge code)'
+    char :prefix, 6,      :desc => 'Prefix (6 digits from film edge code'
+    char :count, 4,       :desc => 'Count (4 digits from film edge code)'
+    char :format, 32,     :desc => 'Format (e.g. Academy)'
 
-  FILM_INFO = Struct[
-      [:id, String, 2],
-      [:type, String, 2],
-      [:offset, String, 2],
-      [:prefix, String, 6],
-      [:count, String, 4],
-      [:format, String, 32],
-      
-      [:frame_position, Integer, U32],
-      [:sequence_extent, Integer, U32],
-      [:held_count, Integer, U32],
-    
-      [:frame_rate, Float, R32],
-      [:shutter_angle, Float, R32],
-      
-      [:frame_id, String, 32],
-      [:slate, String, 100],
-      [:reserve, String, 56],
-  ]
-  
+    u32 :frame_position,  :desc => 'Frame position in sequence'
+    u32 :sequence_extent, :desc => 'Sequence length'
+    u32 :held_count,      :desc => 'For how many frames the frame is held'
 
-  IMAGE_ELEMENT = Struct[
-     [:data_sign, Integer, U32],
-     [:low_data, Integer, U32],
-     [:low_quantity, Float, R32],
-     [:high_data, Integer, U32],
-     [:high_quantity, Float, R32],
-     
-     # TODO: Autoreplace with enum values. Note: with these we will likely be addressing the enums
-     [:descriptor, Integer, U8],
-     [:transfer, Integer, U8],
-     [:colorimetric, Integer, U8],
-     [:bit_size, Integer, U8],
-     
-     [:packing, Integer, U16],
-     [:encoding, Integer, U16],
-     [:data_offset, Integer, U32],
-     [:end_of_line_padding, Integer, U32],
-     [:end_of_image_padding, Integer, U32],
-     [:description, String, 32],
-  ]
-  
-  IMAGE_ELEMENTS = (0..7).map{|e| [e, IMAGE_ELEMENT, struct_size(IMAGE_ELEMENT)] }
-  
-  IMAGE_INFO = Struct[
-    [:orientation, Integer, U16],
-    [:number_elements, Integer, U16],
-    
-    [:pixels_per_line, Integer, U32],
-    [:lines_per_element, Integer, U32],
-    
-    [:image_elements, IMAGE_ELEMENTS, struct_size(IMAGE_ELEMENTS) ],
+    r32 :frame_rate,      :desc => 'Frame rate'
+    r32 :shutter_angle,   :desc => 'Shutter angle'
 
-    [:reserve, String, 52],
-  ]
-  
-  BORDER = (0..3).map{|s| [s, Integer, U16] }
-
-  ASPECT_RATIO = [
-    [0, Integer, U32],
-    [1, Integer, U32],
-  ]
-  
-  ORIENTATION_INFO = Struct[
-  
-    [:x_offset, Integer, U32],
-    [:y_offset, Integer, U32],
-    
-    [:x_center, Float, R32],
-    [:y_center, Float, R32],
-    
-    [:x_size, Integer, U32],
-    [:y_size, Integer, U32],
-    
-    [:filename, String, 100],
-    [:timestamp, String, 24],
-    [:device, String, 32],
-    [:serial, String, 32],
-    
-    [:border, BORDER, struct_size(BORDER)],
-    [:aspect_ratio, ASPECT_RATIO, struct_size(ASPECT_RATIO)],
-    
-    [:reserve, String, 28],
-  ]
-  
-  TELEVISION_INFO = Struct[
-    [:time_code, Integer, U32],
-    [:user_bits, Integer, U32],
-    
-    [:interlace, Integer, U8],
-    [:field_number, Integer, U8],
-    [:video_signal, Integer, U8],
-    [:padding, Integer, U8],
-    
-    [:horizontal_sample_rate, Float, R32],
-    [:vertical_sample_rate, Float, R32],
-    [:frame_rate, Float, R32],
-    [:time_offset, Float, R32],
-    [:gamma, Float, R32],
-    [:black_level, Float, R32],
-    [:black_gain, Float, R32],
-    [:break_point, Float, R32],
-    [:white_level, Float, R32],
-    [:integration_times, Float, R32],
-    [:reserve, String, 76],
-  ]
-  
-  USER_INFO = Struct[
-    [:id, String, 32],
-    [:user_data, Integer, U32],
-  ]
-  
-  DPX_INFO = Struct[
-    [:file, FILE_INFO, struct_size(FILE_INFO)],
-    [:image, IMAGE_INFO, struct_size(IMAGE_INFO)],
-    [:orientation, ORIENTATION_INFO, struct_size(ORIENTATION_INFO)],
-    [:film, FILM_INFO, struct_size(FILM_INFO)],
-    [:television, TELEVISION_INFO, struct_size(TELEVISION_INFO)],
-    [:user, USER_INFO, struct_size(USER_INFO)],
-  ]
-  
-  # Converts the nexted structs to one template that can be fed to Ruby pack/unpack. This yields
-  # some impressive performance improvements (about 1.4 times faster) over reading fields bytewise
-  def self.struct_to_template(struct, big_endian)
-    keys, template = [], ''
-    struct.each do | elem |
-      key, cast, size = elem
-      pattern = case true
-        when cast.is_a?(Struct) # Nested structs
-          inner_keys, inner_template = struct_to_template(cast, big_endian)
-          # Use a dot as a divider. We will detect it later on and merge into nested hashes
-          keys += inner_keys.map{|k| [key, k].join('.') }
-          inner_template
-        when cast.is_a?(Array) # Repeat values
-          inner_keys, inner_template = struct_to_template(cast, big_endian)
-          # Use a dot as a divider. We will detect it later on and merge into nested hashes
-          keys += inner_keys.map{|k| [key, k].join('.') }
-          inner_template
-        when cast == Integer || cast == Timecode
-          keys << key.to_s
-          integer_template(size, big_endian)
-        when cast == String
-          keys << key.to_s
-          "A#{size}"
-        when cast == Float
-          keys << key.to_s
-          big_endian ? "g" : "f"
-      end
-      
-      template << pattern
-    end
-    [keys, template]
+    char :frame_id, 32,   :desc => 'Frame identification (keyframe)' 
+    char :slate, 100,     :desc => 'Slate information'
+    char :reserve, 56
   end
   
-  def self.integer_template(size, big_endian) #:nodoc:
-    if size == 1
-      big_endian ? "c" : "c"
-    elsif size == 2
-      big_endian ? "n" : "v"
-    elsif size == 4
-      big_endian ? "N" : "V"
-    end
+  class ImageElement < Dict
+    u32 :data_sign, :desc => 'Data sign (0=unsigned, 1=signed). Core is unsigned', :req => true
+    
+    u32 :low_data,      :desc => 'Reference low data code value'
+    r32 :low_quantity,  :desc => 'Reference low quantity represented'
+    u32 :high_data,     :desc => 'Reference high data code value (1023 for 10bit per channel)'
+    r32 :high_quantity, :desc => 'Reference high quantity represented'
+    
+    # TODO: Autoreplace with enum values. 
+    # Note: with these we will likely be addressing the enums
+    u8 :descriptor,   :desc => 'Descirptor for this image element (ie Video or Film), by enum', :req => true
+    u8 :transfer,     :desc => 'Transfer function (ie Linear), by enum', :req => true
+    u8 :colorimetric, :desc => 'Colorimetric (ie YcbCr), by enum', :req => true
+    u8 :bit_size,     :desc => 'Bit size for element (ie 10)', :req => true
+    
+    u16 :packing,     :desc => 'Packing (0=Packed into 32-bit words, 1=Filled to 32-bit words))', :req => true
+    u16 :encoding,    :desc => "Encoding (0=None, 1=RLE)", :req => true
+    u32 :data_offset, :desc => 'Offset to data for this image element', :req => true
+    u32 :end_of_line_padding, :desc => "End-of-line padding for this image element"
+    u32 :end_of_image_padding, :desc => "End-of-line padding for this image element"
+    char :description, 32
+  end
+
+  class OrientationInfo < Dict
+
+    u32 :x_offset
+    u32 :y_offset
+  
+    r32 :x_center
+    r32 :y_center
+  
+    u32 :x_size, :desc => 'Original X size'
+    u32 :y_size, :desc => 'Original Y size'
+    
+    char :filename, 100, :desc => "Source image filename"
+    char :timestamp, 24, :desc => "Source image/tape timestamp"
+    char :device,    32, :desc => "Input device or tape"
+    char :serial,    32, :desc => "Input device serial number"
+  
+    array :border, :u16, 2, :desc => 'Border validity: XL, XR, YT, YB'
+    array :aspect_ratio , :u32, 4, :desc => "Aspect (H:V)"
+    
+    char :reserve, 28
   end
   
-  # Shortcuts used to speed up parsing
-  TEMPLATE_KEYS, TEMPLATE_BE = struct_to_template(DPX_INFO, true)
-  TEMPLATE_LE = struct_to_template(DPX_INFO, false)
-  TEMPLATE_LENGTH = struct_size(DPX_INFO)
+  class TelevisionInfo < Dict
+    u32 :time_code, :desc => "Timecode, formatted as HH:MM:SS:FF in the 4 higher bits of each 8bit group"
+    u32 :user_bits, :desc => "Timecode UBITs"
+    u8 :interlace,  :desc => "Interlace (0 = noninterlaced; 1 = 2:1 interlace"
+
+    u8 :field_number, :desc => 'Field number'
+    u8 :video_signal, :desc => "Video signal (by enum)"
+    u8 :padding,      :desc => "Zero (for byte alignment)"
+    
+    r32 :horizontal_sample_rate, :desc => 'Horizontal sampling Hz'
+    r32 :vertical_sample_rate,   :desc => 'Vertical sampling Hz'
+    r32 :frame_rate,             :desc => 'Frame rate'
+    r32 :time_offset,            :desc => 'From sync pulse to first pixel'
+    r32 :gamma,                  :desc => 'Gamma'
+    r32 :black_level,            :desc => 'Black pedestal code value'
+    r32 :black_gain,             :desc => 'Black gain code value'
+    r32 :break_point,            :desc => 'Break point (?)'
+    r32 :white_level,            :desc => 'White level'
+    r32 :integration_times,      :desc => 'Integration times (S)'
+    r32 :reserve
+  end
   
-  #:startdoc:
+  class UserInfo < Dict
+    char :id, 32, :desc => 'Name of the user data tag'
+    u32 :user_data_ptr
+  end
+  
+  class ImageInfo < Dict
+    inner :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
+    u16 :number_elements,                   :desc => 'How many elements to scan', :req => true
+    
+    u32 :pixels_per_line,                   :desc => 'Pixels per horizontal line', :req => true
+    u32 :lines_per_element,                 :desc => 'Line count', :req => true
+    array :image_elements, ImageElement, 8, :desc => "Image elements"
+    char :reserve, 52
+  end
+  
+  class DPX < Dict
+    inner :file, FileInfo,   :desc => "File information"
+    inner :image, ImageInfo, :desc => "Image information"
+    inner :orientation, OrientationInfo, :desc => "Orientation"
+    inner :film, FilmInfo, :desc => "Film industry info"
+    inner :television, TelevisionInfo, :desc => "TV industry info"
+    inner :user, UserInfo, :desc => "User info"
   end
 end

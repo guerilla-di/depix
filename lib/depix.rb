@@ -2,6 +2,7 @@ require 'stringio'
 require 'rubygems'
 require 'timecode'
 
+require File.dirname(__FILE__) + '/depix/dict'
 require File.dirname(__FILE__) + '/depix/structs'
 
 module Depix
@@ -69,43 +70,32 @@ module Depix
       # Returns a printable report on all the headers present in the string
       def describe_string(str)
         reader = new
-        result = reader.deep_parse(str, Structs::DPX_INFO)
+        result = reader.deep_parse(str)
         reader.inform(result)
       end
 
       # Returns a printable report on all the headers present in the file at the path passed
       def describe_file(path)
-        header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
+        header = File.open(path, 'r') { |f| f.read(DPX.length) }
         describe_string(header)
       end
     end
     
     #:stopdoc:
     def from_file(path)
-      header = File.open(path, 'r') { |f| f.read(Structs::TEMPLATE_LENGTH) }
+      header = File.open(path, 'r') { |f| f.read(DPX.length) }
       from_string(header)
     end
     
     def from_string(str) #:nodoc:
-      wrap(deep_parse(str, Structs::DPX_INFO))
+      wrap(deep_parse(str))
     end
     
-    def deep_parse(data, structure)
+    def deep_parse(data)
       magic = data[0..3]
-      template = (magic == "SDPX") ? Structs::TEMPLATE_BE : Structs::TEMPLATE_LE
+      template = (magic == "SDPX") ? DPX.pattern : DPX.pattern
       
-      result = data.unpack(template).map do |e| 
-        case e
-          when String
-            clean = unpad(e)
-            clean.empty? ? nil : clean
-          when Integer
-            (e == BLANK_2 || e == BLANK_4) ? nil : e
-          when Float
-            e.nan? ? nil : e
-        end
-      end
-      result
+      result = DPX.apply!(data)
     end
     
     def inform(result)
@@ -113,29 +103,8 @@ module Depix
     end
     
     def wrap(result)
-      eich = self.class.nestify(Structs::TEMPLATE_KEYS, result)
-      class << eich; include Synthetics; end
-      eich
-    end
-    
-    # FIXME - currently no array handling
-    def self.nestify(keys, values)
-      auto_hash = H.new do |h,k| 
-        h[k] = H.new(&h.default_proc)
-      end
-      
-      keys.each_with_index do |path, idx |
-        value = values[idx]
-        
-        sub, elems = auto_hash, path.split('.')
-        while elems.any?
-          dir = elems.shift
-          dir = dir.to_i if dir =~ /^(\d+)$/
-          elems.any? ? (sub = sub[dir]) : (sub[dir] = value)
-        end
-      end
-      
-      auto_hash
+      class << result; include Synthetics; end
+      result
     end
     
     def unpad(string) # :nodoc:

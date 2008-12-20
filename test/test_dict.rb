@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + '/../lib/depix'
 require File.dirname(__FILE__) + '/../lib/depix/dict'
 require 'test/unit'
 
@@ -41,6 +40,39 @@ class TestField < Test::Unit::TestCase
 
     f = Field.new :name => "foo", :req => true
     assert f.req?
+  end
+  
+  def test_consume_for_field
+    f = Field.new :name => "foo"
+    
+    assert_respond_to f, :consume!
+    assert_nil f.consume!([])
+    assert_equal 1, f.consume!([1])
+    assert_equal 2, f.consume!([2,"foo"])
+
+    ar = [1,2,3]
+    f.consume!(ar)
+    assert_equal [2,3], ar
+  end 
+  
+  def test_consume_for_inner_field
+    catcher = Class.new do
+      def self.consume!(arg)
+        raise RuntimeError if arg == ["julik"]
+      end
+    end
+    
+    f = InnerField.new :cast => catcher
+    assert_respond_to f, :consume!
+    
+    assert_raise(RuntimeError) { f.consume!(["julik"]) }
+  end
+  
+  def test_consume_for_array
+    f = ArrayField.new :members => [Field.new, Field.new]
+    assert_respond_to f, :consume!
+    
+    assert_equal [1,2], f.consume!([1,2])
   end
 end
 
@@ -126,13 +158,13 @@ class TestFieldEmit < Test::Unit::TestCase
     f = Field.emit_char
     conform_field!(f)
     
-    assert_equal "C1", f.pattern
+    assert_equal "A1", f.pattern
     assert_equal 1, f.length
 
     f = Field.emit_char :length => 3
     conform_field!(f)
     
-    assert_equal "C3", f.pattern
+    assert_equal "A3", f.pattern
     assert_equal 3, f.length
   end
   
@@ -183,8 +215,20 @@ class TestDict < Test::Unit::TestCase
     c.fields << Field.emit_char
     
     assert_respond_to c, :pattern
-    assert_equal 'C1C1', c.pattern
+    assert_equal 'A1A1', c.pattern
     assert_equal 2, c.length
+  end
+  
+  def test_dict_consume
+    c = Class.new(Dict)
+    c.char :foo
+    c.char :bar
+    
+    result = c.consume!(["a", "b"])
+    assert_kind_of c, result
+    
+    assert_equal "a", result.foo
+    assert_equal "b", result.bar
   end
   
 end
@@ -201,7 +245,7 @@ class TestDictEmitDSL < Test::Unit::TestCase
     assert_equal 1, c.fields.length
     field = c.fields[0]
     assert_equal 1, field.length
-    assert_equal "C1", field.pattern
+    assert_equal "A1", field.pattern
     assert_equal :tag, field.name
   end
   
@@ -214,7 +258,7 @@ class TestDictEmitDSL < Test::Unit::TestCase
     assert_equal 1, c.fields.length
     field = c.fields[0]
     assert_equal 3, field.length
-    assert_equal "C3", field.pattern
+    assert_equal "A3", field.pattern
     assert_equal :joe, field.name
   end
   
@@ -323,5 +367,18 @@ class TestDictEmitDSL < Test::Unit::TestCase
     
     mem = f.members[0]
     assert_equal c2, mem.cast
+  end
+end
+
+class TestDictApply < Test::Unit::TestCase
+  def test_apply
+    struct = Class.new(Dict) do
+      char :name, "julik".length
+      char :module, "depix".length
+    end
+    
+    result = struct.apply!("julikdepix")
+    assert_equal "julik", result.name
+    assert_equal "depix", result.module
   end
 end

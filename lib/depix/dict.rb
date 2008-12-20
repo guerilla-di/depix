@@ -26,7 +26,7 @@ module Depix
     # Emit a char field
     def self.emit_char(o = {})
       opts = {:length => 1}.merge(o)
-      opts[:pattern] = "C#{opts[:length].to_i}"
+      opts[:pattern] = "A#{opts[:length].to_i}"
       new(opts)
     end
     
@@ -35,6 +35,11 @@ module Depix
       new o.merge({:length => 4, :pattern => "g"})
     end
     
+    # Return the actual values from the stack. The stack will begin on the element we need,
+    # so the default consumption is shift
+    def consume!(stack)
+      stack.shift
+    end
   end
   
   class ArrayField < Field
@@ -48,6 +53,10 @@ module Depix
     def pattern
       members.inject(''){|_, s| _ + s.pattern }
     end
+    
+    def consume!(stack)
+      members.map{|m| m.consume!(stack)}
+    end
   end
   
   class InnerField < Field
@@ -60,6 +69,10 @@ module Depix
     
     def pattern
       cast.pattern
+    end
+    
+    def consume!(stack)
+      cast.consume!(stack)
     end
   end
   
@@ -127,6 +140,18 @@ module Depix
       
       def length
         fields.inject(0){|_, s| _ + s.length }
+      end
+      
+      def consume!(stack_of_unpacked_values)
+        new_item = new
+        @fields.each do | field |
+          new_item.send("#{field.name}=", field.consume!(stack_of_unpacked_values))
+        end
+        new_item
+      end
+      
+      def apply!(string)
+        consume!(string.unpack(pattern))
       end
       
       private
