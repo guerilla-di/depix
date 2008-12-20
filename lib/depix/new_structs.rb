@@ -2,7 +2,64 @@ require File.dirname(__FILE__) + '/structdef'
 
 module Depix
   
-  class FileInfo < Structdef
+  class Field
+    attr_accessor :name, :length, :pattern, :required, :desc
+    alias_method :required?, :required
+
+    def initialize(opts = {})
+      opts.each_pair {|k, v| send(k.to_s + '=', v) }
+    end
+
+    # Emit an unsigned int field
+    def self.emit_u32(o = {})
+      new({:length => 4, :pattern => "N" }.merge(o))
+    end
+    
+    # Emit a short int field
+    def self.emit_u8(o = {})
+      new({:length => 1, :pattern => "c" }.merge(o))
+    end
+
+    # Emit a double int field
+    def self.emit_u16(o = {})
+      new({:length => 2, :pattern => "n" }.merge(o))
+    end
+    
+    # Emit a char field
+    def self.emit_char(o = {})
+      opts = {:length => 1}.merge(o)
+      opts[:pattern] = "C#{opts[:length].to_i}"
+      new(opts)
+    end
+  end
+  
+  class ArrayField < Field
+    attr_accessor :members
+    undef :length=, :pattern=
+    
+    def length
+      members.inject(0){|_, s| _ + s.length }
+    end
+    
+    def pattern
+      members.inject(''){|_, s| _ + s.pattern }
+    end
+  end
+  
+  class InnerField < Field
+    attr_accessor :cast
+    undef :length=, :pattern=
+    
+    def length
+      cast.length
+    end
+    
+    def pattern
+      cast.pattern
+    end
+  end
+  
+  class FileInfo < Fields
     char :magic, 4,       :desc => 'Whether the file is BE', :req => true
     u32  :image_offset,   :desc => 'Offset to image data in bytes', :req => true
     char :version, 8,     :desc => 'Version of header format', :req => true
@@ -14,7 +71,7 @@ module Depix
     u32  :user_size,      :desc => 'User header length'
     
     char :filename, 100,  :desc => 'Original filename'
-    char :timestamp, 24,  :desc => 'Creation timestamp'
+    char :timestamp, 24,  :desc => 'Creation 15'
     char :creator, 100,   :desc => 'Creator application'
     char :roject, 200,    :desc => 'Project name'
     char :copyright, 200, :desc => 'Copyright'
@@ -23,7 +80,7 @@ module Depix
     char :reserve, 104
   end
   
-  class FilmInfo < Structdef
+  class FilmInfo < Fields
     char :id, 2,          :desc => 'Film mfg. ID code (2 digits from film edge code)'
     char :type, 2,        :desc => 'Film type (2 digits from film edge code)'
     char :offset, 2,      :desc => 'Offset in perfs (2 digits from film edge code)'
@@ -43,7 +100,7 @@ module Depix
     char :reserve, 56
   end
   
-  class ImageElement < Structdef
+  class ImageElement < Fields
     u32 :data_sign, :desc => 'Data sign (0=unsigned, 1=signed). Core is unsigned', :req => true
     
     u32 :low_data,      :desc => 'Reference low data code value'
@@ -66,7 +123,7 @@ module Depix
     char :description, 32
   end
 
-  class OrientationInfo < Structdef
+  class OrientationInfo < Fields
 
     u32 :x_offset
     u32 :y_offset
@@ -88,7 +145,7 @@ module Depix
     char :reserve, 28
   end
   
-  class TelevisionInfo < Structdef
+  class TelevisionInfo < Fields
     u32 :time_code, :desc => "Timecode, formatted as HH:MM:SS:FF in the 4 higher bits of each 8bit group"
     u32 :user_bits, :desc => "Timecode UBITs"
     u8 :interlace,  :desc => "Interlace (0 = noninterlaced; 1 = 2:1 interlace"
@@ -110,12 +167,12 @@ module Depix
     r32 :reserve
   end
   
-  class UserInfo < Structdef
+  class UserInfo < Fields
     char :id, 32, :desc => 'Name of the user data tag'
     u32 :user_data_ptr
   end
   
-  class ImageInfo < Structdef
+  class ImageInfo < Fields
     inner :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
     u16 :number_elements,                   :desc => 'How many elements to scan', :req => true
     
@@ -125,15 +182,12 @@ module Depix
     char :reserve, 52
   end
   
-  class DPX < Structdef
-    inner :file, FileInfo
-    inner :image, ImageInfo
-    inner :orientation, OrientationInfo
-    inner :film, FilmInfo
-    inner :television, TelevisionInfo
-    inner :user, UserInfo
+  class DPX < Fields
+    inner :file, FileInfo,   :desc => "File information"
+    inner :image, ImageInfo, :desc => "Image information"
+    inner :orientation, OrientationInfo, :desc => "Orientation"
+    inner :film, FilmInfo, :desc => "Film industry info"
+    inner :television, TelevisionInfo, :desc => "TV industry info"
+    inner :user, UserInfo, :desc => "User info"
   end
-  
-  puts DPX.byte_length
-  
 end
