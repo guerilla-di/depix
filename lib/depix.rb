@@ -13,20 +13,6 @@ module Depix
   BLANK_F = 0xFFFFFFFF #:nodoc:
   BLANK_CHAR = 0xFF #:nodoc:
   
-  # Methodic hash - stolen from Camping
-  class H < Hash
-    # Gets or sets keys in the hash.
-    #
-    #   @cookies.my_favorite = :macadamian
-    #   @cookies.my_favorite
-    #   => :macadamian
-    #
-    def method_missing(m,*a)
-        m.to_s=~/=$/ ? (self[$`] = a[0]) : (a == [] ? (self.key?(m.to_s) ? self[m.to_s] : super ) : super)
-    end
-    undef id, type
-  end
-  
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
     def keycode

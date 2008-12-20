@@ -1,16 +1,6 @@
 require File.dirname(__FILE__) + '/../lib/depix'
 require 'test/unit'
 
-class EichTest < Test::Unit::TestCase
-  def test_eich
-    eich = Depix::H.new
-    assert_nothing_raised { assert_not_nil eich.foo = 1 }
-    assert_nothing_raised { eich.foo }
-    assert_equal ['foo'], eich.keys
-    assert_equal 1, eich.foo
-  end
-end
-
 class ReaderTest < Test::Unit::TestCase
   
   SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'

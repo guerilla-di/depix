@@ -116,7 +116,7 @@ module Depix
   end
   
   class ImageInfo < Dict
-    inner :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
+    u16 :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
     u16 :number_elements,                   :desc => 'How many elements to scan', :req => true
     
     u32 :pixels_per_line,                   :desc => 'Pixels per horizontal line', :req => true
