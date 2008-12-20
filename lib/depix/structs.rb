@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/dict'
 
+
 module Depix
   
   class FileInfo < Dict
@@ -82,8 +83,8 @@ module Depix
     char :device,    32, :desc => "Input device or tape"
     char :serial,    32, :desc => "Input device serial number"
   
-    array :border, :u16, 2, :desc => 'Border validity: XL, XR, YT, YB'
-    array :aspect_ratio , :u32, 4, :desc => "Aspect (H:V)"
+    array :border, :u16, 4, :desc => 'Border validity: XL, XR, YT, YB'
+    array :aspect_ratio , :u32, 2, :desc => "Aspect (H:V)"
     
     char :reserve, 28
   end
@@ -125,6 +126,7 @@ module Depix
     char :reserve, 52
   end
   
+  #:include:DPX_HEADER_STRUCTURE.txt
   class DPX < Dict
     inner :file, FileInfo,   :desc => "File information"
     inner :image, ImageInfo, :desc => "Image information"

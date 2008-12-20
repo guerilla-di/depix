@@ -10,6 +10,7 @@ module FieldConformity
     assert_respond_to f, :pattern
     assert_respond_to f, :req
     assert_respond_to f, :req?
+    assert_respond_to f, :rtype
   end
 end
 
@@ -95,6 +96,11 @@ class TestArrayField < Test::Unit::TestCase
     assert_respond_to f, :members=
   end
   
+  def test_rtype_for_array_field_is_array
+    casted = ArrayField.new(:members => [])
+    assert_equal Array, casted.rtype
+  end
+  
   def test_array_field_accumulates_lengths_and_patterns_from_members
     f = ArrayField.new(:members => [
       Field.new(:name => :foo, :length => 1, :pattern => "C"),
@@ -128,6 +134,12 @@ class TestInnerField < Test::Unit::TestCase
     casted = InnerField.new(:cast => sample)
     assert_equal 123, casted.length
     assert_equal 'C123', casted.pattern
+  end
+  
+  def test_rtype_for_inner_field_is_cast
+    c = Class.new
+    casted = InnerField.new(:cast => c)
+    assert_equal c, casted.rtype
   end
 end
 

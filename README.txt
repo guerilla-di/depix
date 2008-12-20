@@ -9,19 +9,17 @@ Read DPX file metadata
 == SYNOPSIS:
 
   meta = Depix::Reader.from_file(dpx_file_path)
-  puts meta.television.time_code #=> 10:00:00:02
+  puts meta.time_code #=> 10:00:00:02
   
-The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. The structs
-used for actual parsing are in the Depix::Structs module (but in a much less readable form, obviously)
+The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. It's
+a vanilla Ruby object with no extra methods except for the readers that have the same name as the specified
+fields
 
 The gem also contains an executable called depix-desribe which can be used from the command line
   
   $book depix-describe 001_PTAPE_001.001.dpx
 
 == NOTES:
-
-The reader tries to be efficient - fast Ruby unpacking is used, some shortcuts are taken. Also don't worry - we do not need to read
-the whole DPX file (which usually is around 8mb per frame) to know the details.
 
 In the future there will be a possibility to modify and commit the headers, but it's not a priority at this time.
 

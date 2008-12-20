@@ -1,14 +1,13 @@
 # Generates an RDoc description of the DPX structs from the structs.rb file
-class RdocExplainer < Formatter #:nodoc:
+class RdocExplainer #:nodoc:
   attr_accessor :io, :attr_template, :struct_template
   
   TPL = <<eof
 = DPX header structure description
 
-DPX metadata gets returned as a hash containing other nested hashes. You can address hash keys by symbol, string
-and method name
-
-  meta.file.magic # same as meta[:file][:magic]
+DPX metadata gets returned as a Depix::DPX object with nested properties.
+  
+  meta.file.magic # => "SDPX"
 
 == Metadata structure
 
@@ -17,36 +16,44 @@ eof
 
   def initialize
     @padding =  '  '
-    @attr_template = "%s* <tt>%s</tt> %s"
-    @struct_template = "%s* <tt>%s</tt> hash of"
+    @attr_template = "%s* <tt>%s</tt> %s %s%s"
+    @struct_template = "%s* <tt>%s</tt> a %s object"
     @array_template  = "%s* <tt>%s</tt>  (array , %d members):"
     
   end
   
   def get_rdoc_for(struct)
     @io = StringIO.new
-    explain_struct(Depix::Structs::DPX_INFO)
+    explain_struct(struct)
     TPL % @io.string
   end
   
+  include Depix
+  
   def explain_struct(struct, padding = '') #:nodoc:
-    struct.each do | e |
-      key, cast, len = e
-      if cast.is_a?(Depix::Structs::Struct)
-        @io.puts( @struct_template % [padding, key, len])
-        explain_struct(cast, padding + @padding)
-      elsif cast.is_a?(Array) # Repeats
-        @io.puts( @array_template % [padding, key, cast.size])
-        inner_struct = cast[0]
-        ikey, icast, ilen = inner_struct
-        if icast.is_a?(Depix::Structs::Struct)
-          explain_struct(icast, padding + @padding)
-        else
-          @io.puts( @attr_template % [padding, '', icast, ilen])
+    struct.fields.each do | e |
+      if e.is_a?(InnerField)
+        
+        @io.puts( @struct_template % [padding, e.name, e.rtype])
+        explain_struct(e.rtype, padding + @padding)
+      
+      elsif e.is_a?(ArrayField)
+        
+        @io.puts( @array_template % [padding, e.name, e.members.size])
+        
+        inner_struct = e.members[0]
+        
+        if inner_struct.is_a?(InnerField)
+          explain_struct(inner_struct.rtype, padding + @padding)
         end
       else
-        @io.puts( @attr_template % [padding, key, cast, len])
+        explain_attr(padding, e)
       end
     end
+  end
+  
+  def explain_attr(padding, e)
+    type_name = e.rtype ? "(#{e.rtype})" : nil
+    @io.puts( @attr_template % [padding, e.name, type_name, e.desc, (e.req? ? " - Required" : nil)])
   end
 end

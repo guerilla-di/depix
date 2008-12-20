@@ -1,7 +1,7 @@
 module Depix
   
   class Field
-    attr_accessor :name, :length, :pattern, :req, :desc
+    attr_accessor :name, :length, :pattern, :req, :desc, :rtype
     alias_method :req?, :req
 
     def initialize(opts = {})
@@ -57,6 +57,10 @@ module Depix
     def consume!(stack)
       members.map{|m| m.consume!(stack)}
     end
+    
+    def rtype
+      Array
+    end
   end
   
   class InnerField < Field
@@ -73,6 +77,10 @@ module Depix
     
     def consume!(stack)
       cast.consume!(stack)
+    end
+    
+    def rtype
+      cast
     end
   end
   
