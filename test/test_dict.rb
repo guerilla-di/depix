@@ -287,6 +287,23 @@ class TestDoubleField < Test::Unit::TestCase
   end
 end
 
+class TestFillerField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_field_conformity
+    f = Filler.new
+    conform_field!(f)
+    assert_equal "x1", f.pattern
+  end
+  
+  def test_apply
+    data = [1,2,3].pack("ccc")
+    filler = Filler.new(:length => 3)
+    unpacked = data.unpack(filler.pattern)
+    assert_equal [], unpacked
+  end
+end
+
 class TestFieldEmit < Test::Unit::TestCase
   include FieldConformity
   

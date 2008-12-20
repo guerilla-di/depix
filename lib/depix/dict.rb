@@ -91,15 +91,11 @@ module Depix
   
   class Filler < Field
     def pattern
-      "a#{length.to_i}"
+      "x#{length ? length.to_i : 1}"
     end
     
-    def clean(v)
-      nil
-    end
-    
+    # Leave the stack alone since we skipped
     def consume(stack)
-      stack.shift
       nil
     end
   end

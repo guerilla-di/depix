@@ -71,5 +71,6 @@ class ReaderTest < Test::Unit::TestCase
   def test_parsed_properly_using_compact_structs
     file = SAMPLE_DPX
     parsed = Depix::Reader.from_file(file, compact = true)
+    puts parsed.television.inspect
   end
 end
