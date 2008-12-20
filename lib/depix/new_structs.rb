@@ -134,6 +134,6 @@ module Depix
     inner :user, UserInfo
   end
   
-  puts DPX.to_template
+  puts DPX.byte_length
   
 end
