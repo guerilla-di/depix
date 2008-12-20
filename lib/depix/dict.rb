@@ -89,6 +89,21 @@ module Depix
     end
   end
   
+  class Filler < Field
+    def pattern
+      "a#{length.to_i}"
+    end
+    
+    def clean(v)
+      nil
+    end
+    
+    def consume(stack)
+      stack.shift
+      nil
+    end
+  end
+    
   class U16Field < Field
     BLANK = 0xFFFF
     
@@ -133,7 +148,11 @@ module Depix
     end
     
     def clean(v)
-      v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
+      begin
+        v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
+      rescue NoMethodError
+        v
+      end
     end
     
     def rtype
@@ -261,7 +280,7 @@ module Depix
       def consume!(stack_of_unpacked_values)
         new_item = new
         @fields.each do | field |
-          new_item.send("#{field.name}=", field.consume!(stack_of_unpacked_values))
+          new_item.send("#{field.name}=", field.consume!(stack_of_unpacked_values)) unless field.name.nil?
         end
         new_item
       end
@@ -270,12 +289,37 @@ module Depix
         consume!(string.unpack(pattern))
       end
       
+      # Get a class that would parse just the same, preserving only the fields passed in the array. This speeds
+      # up parsing because we only extract and conform the fields that we need
+      def only(*field_names)
+        distillate = fields.inject([]) do | m, f |
+          if field_names.include?(f.name) # preserve
+            m.push(f)
+          else # create filler
+            unless m[-1].is_a?(Filler)
+              m.push(Filler.new(:length =>  f.length))
+            else
+              m[-1].length += f.length
+            end
+            m
+          end
+        end
+        
+        anon = Class.new(self)
+        anon.fields.replace(distillate)
+        anon
+      end
+      
+      def filler
+        only([])
+      end
+      
       private
 
       # extract_options! on a diet
       def count_and_opts_from(args)
-        [count, options]        options, count = (args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS), (args.shift || 1)
-
+        options, count = (args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS), (args.shift || 1)
+        [count, options]
       end
     end
   end

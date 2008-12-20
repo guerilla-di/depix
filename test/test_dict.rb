@@ -528,6 +528,85 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
 end
 
+class TestDictCompact < Test::Unit::TestCase
+  def test_only_with_interspersed_fields
+    c = Class.new(Dict) do
+      u8 :some
+      u8 :another
+      u8 :third
+    end
+    
+    distill = c.only(:another)
+
+    assert_equal distill.length, c.length, "The distilled struct should occupy the same space"
+
+    assert distill.ancestors.include?(c)
+    assert_equal 3, distill.fields.length
+    
+    assert_kind_of Filler, distill.fields[0]
+    assert_equal 1, distill.fields[0].length
+    
+    assert_kind_of U8Field, distill.fields[1]
+    assert_equal 1, distill.fields[0].length
+
+    assert_kind_of Filler, distill.fields[2]
+    assert_equal 1, distill.fields[2].length
+    
+  end
+  
+  def test_only_with_fields_in_a_row
+    c = Class.new(Dict) do
+      u8   :some
+      u32  :another
+      u8   :third
+      u32  :fourth
+      char :fifth, 10
+    end
+    
+    distill = c.only(:third)
+    assert_equal distill.length, c.length, "The distilled struct should occupy the same space"
+    assert_equal 3, distill.fields.length
+    
+    assert_kind_of Filler, distill.fields[0]
+    assert_equal 5, distill.fields[0].length
+
+    assert_kind_of Filler, distill.fields[2]
+    assert_equal 14, distill.fields[2].length
+  end
+  
+  def test_get_filler
+    c = Class.new(Dict) do
+      u32 :some
+    end
+    
+    filler = c.filler
+    assert_equal filler.length, c.length
+    assert_equal 1, c.fields.length
+  end
+  
+  def test_filler_parses_the_same
+    c = Class.new(Dict) do
+      u8 :first
+      u8 :second
+      u8 :third
+    end
+    
+    distill = c.only(:second)
+    
+    data = [1,2,3].pack("ccc")
+    
+    base_r = c.apply!(data)
+    assert_not_nil  base_r.first
+    assert_not_nil  base_r.third
+    assert_equal 2, base_r.second
+    
+    r = distill.apply!(data)
+    assert_nil r.first
+    assert_nil r.third
+    assert_equal 2, r.second
+  end
+end
+
 class TestDictApply < Test::Unit::TestCase
   def test_apply
     struct = Class.new(Dict) do

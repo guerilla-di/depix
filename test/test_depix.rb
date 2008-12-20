@@ -67,4 +67,9 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal :Linear, parsed.colorimetric
     assert_equal "E012", parsed.flame_reel
   end
+  
+  def test_parsed_properly_using_compact_structs
+    file = SAMPLE_DPX
+    parsed = Depix::Reader.from_file(file, compact = true)
+  end
 end
