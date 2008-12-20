@@ -11,7 +11,46 @@ module FieldConformity
     assert_respond_to f, :req
     assert_respond_to f, :req?
     assert_respond_to f, :rtype
+    assert_respond_to f, :explain
   end
+end
+
+class FieldExplainsItself < Test::Unit::TestCase
+  def test_explain
+    f = Field.new :rtype => self.class, :desc => "Eats people"
+    assert_equal "(FieldExplainsItself) Eats people", f.explain
+  end 
+  
+  def test_explain_with_verbatim
+    f = Field.new :desc => "Eats people"
+    assert_equal "Eats people", f.explain
+  end
+
+  def test_explain_with_verbatim_and_required
+    f = Field.new :desc => "Eats people", :req => true
+    assert_equal "Eats people - required", f.explain
+  end
+
+  def test_explain_with_no_data
+    f = Field.new
+    assert_equal "", f.explain
+  end
+  
+  def test_explaion_for_empty_array
+    f = ArrayField.new
+    assert_equal "Empty array", f.explain
+  end
+  
+  def test_explain_for_array_with_members
+    f = ArrayField.new :members => [U8Field.new, U8Field.new], :desc => "Eats babies"
+    assert_equal "(Array of 2 Integer fields) Eats babies", f.explain
+  end
+
+  def test_explain_for_nested_struct
+    f = InnerField.new :cast => self.class, :desc => "Link to test case"
+    assert_equal "(FieldExplainsItself) Link to test case", f.explain
+  end
+
 end
 
 class TestField < Test::Unit::TestCase
@@ -143,6 +182,111 @@ class TestInnerField < Test::Unit::TestCase
   end
 end
 
+class TestWideIntField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_u32_field_contorms_to_basics
+    f = U32Field.new :name  => :foo
+    conform_field!(f)
+    
+    assert_equal "N", f.pattern
+    assert_equal 4, f.length
+    assert_equal :foo, f.name
+    assert_equal 66, f.clean(66)
+    assert_equal nil, f.clean(0xFFFFFFFF)
+  end
+end
+
+class TestCharField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_char_field_conforms_to_basics
+    f = CharField.new :name  => :foo
+    conform_field!(f)
+  end
+  
+  def test_char_field_pads
+    f = CharField.new :name => :foo, :length => 15
+    
+    assert_equal "A15", f.pattern
+    assert_equal 15, f.length
+    assert_equal String, f.rtype
+  end
+  
+  def test_char_field_clean
+    f = CharField.new :name => :foo, :length => 15
+    assert_equal "", f.clean("\000")
+  end
+end
+
+class TestFloatField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_r32_field_contorms_to_basics
+    f = R32Field.new :name  => :foo
+    conform_field!(f)
+    
+    the_nan = Class.new do
+      def nan?; true; end
+    end.new
+    
+    assert_equal "g", f.pattern
+    assert_equal 4, f.length
+    assert_equal :foo, f.name
+    assert_equal Float, f.rtype
+    assert_equal nil, f.clean(the_nan)
+  end
+end
+
+class TestSmallintField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_smallint_conformity
+    f = U8Field.new :name => :foo
+    conform_field!(f)
+  end
+  
+  def test_smallint_operation
+    f = U8Field.new
+    
+    assert_equal 'c', f.pattern
+    assert_equal 1, f.length
+    assert_equal Integer, f.rtype
+  end
+  
+  def test_smallint_clean
+    f = U8Field.new
+    
+    assert_equal nil, f.clean(0xFF)
+    assert_equal 10, f.clean(10)
+  end
+  
+end
+
+class TestDoubleField < Test::Unit::TestCase
+  include FieldConformity
+  
+  def test_double_conformity
+    f = U16Field.new :name => :foo
+    conform_field!(f)
+  end
+  
+  def test_double_operation
+    f = U16Field.new
+    
+    assert_equal 'n', f.pattern
+    assert_equal 2, f.length
+    assert_equal Integer, f.rtype
+  end
+  
+  def test_double_clean
+    f = U16Field.new
+    
+    assert_equal nil, f.clean(0xFFFF)
+    assert_equal 10, f.clean(10)
+  end
+end
+
 class TestFieldEmit < Test::Unit::TestCase
   include FieldConformity
   
@@ -231,6 +375,9 @@ class TestDict < Test::Unit::TestCase
     assert_equal 2, c.length
   end
   
+end
+
+class TestDictConsume < Test::Unit::TestCase
   def test_dict_consume
     c = Class.new(Dict)
     c.char :foo
@@ -242,9 +389,7 @@ class TestDict < Test::Unit::TestCase
     assert_equal "a", result.foo
     assert_equal "b", result.bar
   end
-  
 end
-
 
 class TestDictEmitDSL < Test::Unit::TestCase
 
@@ -256,6 +401,7 @@ class TestDictEmitDSL < Test::Unit::TestCase
     
     assert_equal 1, c.fields.length
     field = c.fields[0]
+
     assert_equal 1, field.length
     assert_equal "A1", field.pattern
     assert_equal :tag, field.name
@@ -341,7 +487,7 @@ class TestDictEmitDSL < Test::Unit::TestCase
     assert_kind_of ArrayField, field
     assert_equal "Two coordinates", field.desc
     assert_equal 1, field.members.length
-    assert_equal Field, field.members[0].class 
+    assert_equal U32Field, field.members[0].class
   end
   
   def test_dict_emit_inner

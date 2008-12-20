@@ -1,44 +1,143 @@
 module Depix
   
+  #:stopdoc:
   class Field
     attr_accessor :name, :length, :pattern, :req, :desc, :rtype
     alias_method :req?, :req
-
+    
+    # Hash init
     def initialize(opts = {})
       opts.each_pair {|k, v| send(k.to_s + '=', v) }
     end
 
     # Emit an unsigned int field
     def self.emit_u32(o = {})
-      new({:length => 4, :pattern => "N" }.merge(o))
+      U32Field.new(o)
     end
     
     # Emit a short int field
     def self.emit_u8(o = {})
-      new({:length => 1, :pattern => "c" }.merge(o))
+      U8Field.new(o)
     end
 
     # Emit a double int field
     def self.emit_u16(o = {})
-      new({:length => 2, :pattern => "n" }.merge(o))
+      U16Field.new(o)
     end
     
     # Emit a char field
     def self.emit_char(o = {})
       opts = {:length => 1}.merge(o)
-      opts[:pattern] = "A#{opts[:length].to_i}"
-      new(opts)
+      CharField.new(opts)
     end
     
     # Emit a float field
     def self.emit_r32(o = {})
-      new o.merge({:length => 4, :pattern => "g"})
+      R32Field.new(o)
+    end
+    
+    # Return a cleaned value
+    def clean(v)
+      v
+    end
+    
+    def explain
+      [rtype ? ("(%s)" % rtype) : nil, desc, (req? ? "- required" : nil)].compact.join(' ')
     end
     
     # Return the actual values from the stack. The stack will begin on the element we need,
     # so the default consumption is shift
     def consume!(stack)
-      stack.shift
+      clean(stack.shift)
+    end
+  end
+  
+  class U32Field < Field
+    BLANK = 0xFFFFFFFF
+    
+    def pattern
+      "N"
+    end
+    
+    def length
+      4
+    end
+    
+    def clean(value)
+      value == BLANK ? nil : value
+    end
+  end
+  
+  class U8Field < Field
+
+    BLANK = 0xFF
+
+    def pattern
+      "c"
+    end
+    
+    def length
+      1
+    end
+    
+    def rtype
+      Integer
+    end
+    
+    def clean(v)
+      v == BLANK ? nil : v
+    end
+  end
+  
+  class U16Field < Field
+    BLANK = 0xFFFF
+    
+    def pattern
+      "n"
+    end
+    
+    def length
+      2
+    end
+    
+    def rtype
+      Integer
+    end
+    
+    def clean(v)
+      v == BLANK ? nil : v
+    end
+  end
+  
+  class R32Field < Field
+    def pattern
+      "g"
+    end
+    
+    def clean(v)
+      v.nan? ? nil : v
+    end
+    
+    def length
+      4
+    end
+    
+    def rtype
+      Float
+    end
+  end
+  
+  class CharField < Field
+    def pattern
+      "A#{(length || 1).to_i}"
+    end
+    
+    def clean(v)
+      v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
+    end
+    
+    def rtype
+      String
     end
   end
   
@@ -60,6 +159,13 @@ module Depix
     
     def rtype
       Array
+    end
+    
+    def explain
+      return 'Empty array' if (!members || members.empty?)
+      tpl = "(Array of %d %s fields)" % [ members.length, members[0].rtype]
+      r = (req? ? "- required" : nil)
+      [tpl, desc, r].compact.join(' ')
     end
   end
   
@@ -84,6 +190,7 @@ module Depix
     end
   end
   
+  # Base class for a struct. Could also be implemented as a module actually
   class Dict
     DEF_OPTS = { :req => false, :desc => nil }
     
@@ -150,6 +257,7 @@ module Depix
         fields.inject(0){|_, s| _ + s.length }
       end
       
+      # Consume a stack of unpacked values, letting each field decide how many to consume
       def consume!(stack_of_unpacked_values)
         new_item = new
         @fields.each do | field |
@@ -166,10 +274,11 @@ module Depix
 
       # extract_options! on a diet
       def count_and_opts_from(args)
-        options = args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS
-        count = args.shift || 1
-        [count, options]
+        [count, options]        options, count = (args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS), (args.shift || 1)
+
       end
     end
   end
+  
+  #:startdoc:
 end

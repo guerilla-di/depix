@@ -4,14 +4,10 @@ require 'timecode'
 
 require File.dirname(__FILE__) + '/depix/dict'
 require File.dirname(__FILE__) + '/depix/structs'
+require File.dirname(__FILE__) + '/depix/enums'
 
 module Depix
-  VERSION = '1.0.1'
-  
-  BLANK_2 = 0xFFFF #:nodoc:
-  BLANK_4 = 0xFFFFFFFF #:nodoc:
-  BLANK_F = 0xFFFFFFFF #:nodoc:
-  BLANK_CHAR = 0xFF #:nodoc:
+  VERSION = '1.0.2'
   
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
@@ -29,14 +25,18 @@ module Depix
     
     # Get the name of the transfer function (Linear, Logarithmic, ...)
     def colorimetric
-      Structs::COLORIMETRIC.invert[image.image_elements[0].colorimetric]
+      COLORIMETRIC.invert[image.image_elements[0].colorimetric]
     end
     
     # Get the name of the compnent type (RGB, YCbCr, ...)
     def component_type
-      Structs::COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
+      COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
     end
-
+    
+    # Is this DPX file little-endian? This would be an exception, but still useful
+    def le?
+      file.magic == 'XPDS'
+    end
   end
   
   # Reads the metadata
@@ -79,13 +79,17 @@ module Depix
     
     def deep_parse(data)
       magic = data[0..3]
-      template = (magic == "SDPX") ? DPX.pattern : DPX.pattern
+      template = (magic == "SDPX") ? DPX.pattern : make_le(DPX.pattern)
       
-      result = DPX.apply!(data)
+      result = DPX.consume!(data.unpack(template))
     end
     
     def inform(result)
       Structs::TEMPLATE_KEYS.zip(result).map{|k, v| "#{k}:#{v}" unless v.nil? }.compact.join("\n")
+    end
+    
+    def make_le(pattern)
+      pattern.gsub(/n/, "v").gsub(/N/, "V").gsub(/g/, "f")
     end
     
     def wrap(result)

@@ -16,9 +16,9 @@ eof
 
   def initialize
     @padding =  '  '
-    @attr_template = "%s* <tt>%s</tt> %s %s%s"
-    @struct_template = "%s* <tt>%s</tt> a %s object"
-    @array_template  = "%s* <tt>%s</tt>  (array , %d members):"
+    @attr_template = "%s* <tt>%s</tt> %s"
+    @struct_template = "%s* <tt>%s</tt> %s:"
+    @array_template  = "%s* <tt>%s</tt> %s:"
     
   end
   
@@ -34,12 +34,12 @@ eof
     struct.fields.each do | e |
       if e.is_a?(InnerField)
         
-        @io.puts( @struct_template % [padding, e.name, e.rtype])
+        @io.puts( @struct_template % [padding, e.name, e.explain])
         explain_struct(e.rtype, padding + @padding)
       
       elsif e.is_a?(ArrayField)
         
-        @io.puts( @array_template % [padding, e.name, e.members.size])
+        @io.puts( @array_template % [padding, e.name, e.explain])
         
         inner_struct = e.members[0]
         
@@ -54,6 +54,6 @@ eof
   
   def explain_attr(padding, e)
     type_name = e.rtype ? "(#{e.rtype})" : nil
-    @io.puts( @attr_template % [padding, e.name, type_name, e.desc, (e.req? ? " - Required" : nil)])
+    @io.puts( @attr_template % [padding, e.name, e.explain])
   end
 end

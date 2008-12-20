@@ -61,6 +61,7 @@ class ReaderTest < Test::Unit::TestCase
 
     file = SAMPLE_DPX
     parsed = Depix::Reader.from_file(file)
+    assert_equal false, parsed.le?
     assert_equal "75 00 19 740612 9841", parsed.keycode
     assert_equal :RGB, parsed.component_type
     assert_equal :Linear, parsed.colorimetric
