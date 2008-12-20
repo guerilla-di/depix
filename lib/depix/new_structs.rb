@@ -19,7 +19,7 @@ module Depix
     char :roject, 200,    :desc => 'Project name'
     char :copyright, 200, :desc => 'Copyright'
     
-    u32  :encrypt_key, :desc => 'Encryption key'
+    u32  :encrypt_key,    :desc => 'Encryption key'
     char :reserve, 104
   end
   
@@ -116,11 +116,11 @@ module Depix
   end
   
   class ImageInfo < Structdef
-    inner :orientation, OrientationInfo, :desc => 'Orientation descriptor',    :req => true
-    u16 :number_elements,                :desc => 'How many elements to scan', :req => true
+    inner :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
+    u16 :number_elements,                   :desc => 'How many elements to scan', :req => true
     
-    u32 :pixels_per_line,                :desc => 'Pixels per horizontal line', :req => true
-    u32 :lines_per_element,              :desc => 'Line count', :req => true
+    u32 :pixels_per_line,                   :desc => 'Pixels per horizontal line', :req => true
+    u32 :lines_per_element,                 :desc => 'Line count', :req => true
     array :image_elements, ImageElement, 8, :desc => "Image elements"
     char :reserve, 52
   end
