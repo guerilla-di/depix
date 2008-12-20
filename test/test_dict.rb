@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../lib/depix'
-require File.dirname(__FILE__) + '/../lib/depix/structdef'
+require File.dirname(__FILE__) + '/../lib/depix/dict'
 require 'test/unit'
 
 include Depix
@@ -169,6 +169,10 @@ class TestDict < Test::Unit::TestCase
     end
   end
   
+  def test_dict_aggregates_its_template
+    c = Class.new(Dict)
+    assert_equal '', c.template
+  end
 end
 
 
