@@ -88,5 +88,9 @@ class ReaderTest < Test::Unit::TestCase
     
     s = "Mary had a little lamb" * 1000
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
+
+    s = "SDPX Mary had a little lamb" * 1000
+    assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
+
   end
 end

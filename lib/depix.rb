@@ -83,24 +83,25 @@ module Depix
     # The hear of Depix
     def parse(data, compact)
       magic = data[0..3]
+      
+      raise InvalidHeader unless %w( SDPX XPDS).include?(magic)
+      
       struct = compact ? CompactDPX : DPX
       
       is_be = (magic == "SDPX")
-      sanity_checker = FileInfo.only(:magic, :version)
+      version_check = FileInfo.only(:magic, :version)
       
       result = begin
         if is_be
-          sanity_checker.consume!(data.unpack(sanity_checker.pattern))
+          version_check.consume!(data.unpack(version_check.pattern))
         else
-          sanity_checker.consume!(data.unpack(make_le(sanity_checker.pattern)))
+          version_check.consume!(data.unpack(make_le(version_check.pattern)))
         end
       rescue ArgumentError
         raise InvalidHeader
       end
       
-      unless %w( SDPX XPDS).include?(result.magic) && result.version == "V1.0"
-        raise InvalidHeader
-      end
+      raise InvalidHeader unless result.version == "V1.0"
        
       template = is_be ? DPX.pattern : make_le(DPX.pattern)
       struct.consume!(data.unpack(struct.pattern))
