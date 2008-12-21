@@ -622,6 +622,9 @@ class TestDictCompact < Test::Unit::TestCase
     assert_equal distill.length, c.length, "The distilled struct should occupy the same space"
     assert_equal 3, distill.fields.length
     
+    result = distill.apply!("abcdefhjhjkujkdkklsalierioeiore")
+    assert_raise(RuntimeError) { result.some }
+    
     assert_kind_of Filler, distill.fields[0]
     assert_equal 5, distill.fields[0].length
 
