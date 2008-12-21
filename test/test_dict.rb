@@ -13,6 +13,10 @@ module FieldConformity
     assert_respond_to f, :rtype
     assert_respond_to f, :explain
   end
+  
+  def no_method(f, method)
+    fail("#{f.inspect} should not respond to #{method}") if f.respond_to?(method)
+  end
 end
 
 class FieldExplainsItself < Test::Unit::TestCase
@@ -129,6 +133,12 @@ class TestArrayField < Test::Unit::TestCase
     assert_raise(NoMethodError) { f.pattern = 'C' }
   end
   
+  def test_array_does_not_allow_setting_length
+    f = ArrayField.new
+    no_method(f, :length=)
+    no_method(f, :pattern=)
+  end
+  
   def test_array_field_has_members
     f = ArrayField.new
     assert_respond_to f, :members
@@ -173,6 +183,10 @@ class TestInnerField < Test::Unit::TestCase
     casted = InnerField.new(:cast => sample)
     assert_equal 123, casted.length
     assert_equal 'C123', casted.pattern
+    
+    no_method(casted, :length=)
+    no_method(casted, :pattern=)
+    
   end
   
   def test_rtype_for_inner_field_is_cast
@@ -249,6 +263,10 @@ class TestSmallintField < Test::Unit::TestCase
   def test_smallint_conformity
     f = U8Field.new :name => :foo
     conform_field!(f)
+    
+    no_method(f, :pattern=)
+    no_method(f, :length=)
+    
   end
   
   def test_smallint_operation
@@ -274,6 +292,9 @@ class TestDoubleField < Test::Unit::TestCase
   def test_double_conformity
     f = U16Field.new :name => :foo
     conform_field!(f)
+
+    no_method(f, :pattern=)
+    no_method(f, :length=)
   end
   
   def test_double_operation
@@ -299,6 +320,10 @@ class TestFillerField < Test::Unit::TestCase
     f = Filler.new
     conform_field!(f)
     assert_equal "x1", f.pattern
+  end
+  
+  def test_filler_does_not_allow_setting_pattern
+    no_method(Filler.new, :pattern=)
   end
   
   def test_pattern_discards_value

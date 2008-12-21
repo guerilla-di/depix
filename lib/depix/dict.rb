@@ -54,6 +54,7 @@ module Depix
   
   class U32Field < Field
     BLANK = 0xFFFFFFFF
+    undef :length=, :pattern=
     
     def pattern
       "N"
@@ -69,6 +70,7 @@ module Depix
   end
   
   class U8Field < Field
+    undef :length=, :pattern=
 
     BLANK = 0xFF
 
@@ -90,6 +92,7 @@ module Depix
   end
   
   class Filler < Field
+    undef :pattern=
     def pattern
       "x#{length ? length.to_i : 1}"
     end
@@ -102,6 +105,7 @@ module Depix
     
   class U16Field < Field
     BLANK = 0xFFFF
+    undef :length=, :pattern=
     
     def pattern
       "n"
@@ -121,6 +125,8 @@ module Depix
   end
   
   class R32Field < Field
+    undef :length=, :pattern=
+    
     def pattern
       "g"
     end
