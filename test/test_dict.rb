@@ -14,7 +14,7 @@ module FieldConformity
     assert_respond_to f, :explain
   end
   
-  def no_method(f, method)
+  def assert_method_removed(f, method)
     fail("#{f.inspect} should not respond to #{method}") if f.respond_to?(method)
   end
 end
@@ -129,14 +129,14 @@ class TestArrayField < Test::Unit::TestCase
     
     assert_respond_to f, :name=
     
-    no_method f, :length=
-    no_method f, :pattern=
+    assert_method_removed f, :length=
+    assert_method_removed f, :pattern=
   end
   
   def test_array_does_not_allow_setting_length
     f = ArrayField.new
-    no_method(f, :length=)
-    no_method(f, :pattern=)
+    assert_method_removed(f, :length=)
+    assert_method_removed(f, :pattern=)
   end
   
   def test_array_field_has_members
@@ -172,8 +172,8 @@ class TestInnerField < Test::Unit::TestCase
     assert_respond_to f, :cast
     assert_respond_to f, :cast=
     
-    assert_raise(NoMethodError) { f.length = 1 }
-    assert_raise(NoMethodError) { f.pattern = 'C' }
+    assert_method_removed(f, :length=)
+    assert_method_removed(f, :pattern=)
   end
   
   def test_inner_field_asks_cast_for_pattern_and_length
@@ -184,8 +184,8 @@ class TestInnerField < Test::Unit::TestCase
     assert_equal 123, casted.length
     assert_equal 'C123', casted.pattern
     
-    no_method(casted, :length=)
-    no_method(casted, :pattern=)
+    assert_method_removed(casted, :length=)
+    assert_method_removed(casted, :pattern=)
     
   end
   
@@ -217,7 +217,7 @@ class TestCharField < Test::Unit::TestCase
   def test_char_field_conforms_to_basics
     f = CharField.new :name  => :foo
     conform_field!(f)
-    no_method(f, :pattern=)
+    assert_method_removed(f, :pattern=)
   end
   
   def test_char_field_pads
@@ -265,8 +265,8 @@ class TestSmallintField < Test::Unit::TestCase
     f = U8Field.new :name => :foo
     conform_field!(f)
     
-    no_method(f, :pattern=)
-    no_method(f, :length=)
+    assert_method_removed(f, :pattern=)
+    assert_method_removed(f, :length=)
     
   end
   
@@ -294,8 +294,8 @@ class TestDoubleField < Test::Unit::TestCase
     f = U16Field.new :name => :foo
     conform_field!(f)
 
-    no_method(f, :pattern=)
-    no_method(f, :length=)
+    assert_method_removed(f, :pattern=)
+    assert_method_removed(f, :length=)
   end
   
   def test_double_operation
@@ -324,7 +324,7 @@ class TestFillerField < Test::Unit::TestCase
   end
   
   def test_filler_does_not_allow_setting_pattern
-    no_method(Filler.new, :pattern=)
+    assert_method_removed(Filler.new, :pattern=)
   end
   
   def test_pattern_discards_value
@@ -623,13 +623,15 @@ class TestDictCompact < Test::Unit::TestCase
     assert_equal 3, distill.fields.length
     
     result = distill.apply!("abcdefhjhjkujkdkklsalierioeiore")
-    assert_raise(RuntimeError) { result.some }
     
     assert_kind_of Filler, distill.fields[0]
     assert_equal 5, distill.fields[0].length
 
     assert_kind_of Filler, distill.fields[2]
     assert_equal 14, distill.fields[2].length
+    
+    assert_nil result.some
+    assert_nil result.fourth
   end
   
   def test_get_filler

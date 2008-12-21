@@ -329,12 +329,7 @@ module Depix
         anon.fields.replace(distillate)
         only_items = distillate.map{|n| n.name }
         
-        (self.fields.map{ |f| f.name } - only_items).each do | key |
-          anon.class.send(:define_method, key) { raise "This property is not fetched by this structure" }
-        end
-        
         anon
-        
       end
       
       # Get an opaque struct based on this one, that will consume exactly as many bytes as this
