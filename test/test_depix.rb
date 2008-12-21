@@ -73,4 +73,8 @@ class ReaderTest < Test::Unit::TestCase
     file = SAMPLE_DPX
     assert_nothing_raised { Depix.from_file(file, compact = true) }
   end
+  
+  def test_describe
+    puts Depix.describe_file(SAMPLE_DPX)
+  end
 end
