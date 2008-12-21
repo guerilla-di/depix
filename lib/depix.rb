@@ -10,6 +10,8 @@ require File.dirname(__FILE__) + '/depix/enums'
 module Depix
   VERSION = '1.0.2'
   
+  class InvalidHeader < RuntimeError; end
+  
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
     def keycode
@@ -71,7 +73,11 @@ module Depix
     
     def from_file(path, compact)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
-      parse(header, compact)
+      begin
+        parse(header, compact)
+      rescue InvalidHeader => e
+        raise InvalidHeader, "Invalid header in file #{path}"
+      end
     end
     
     # The hear of Depix
@@ -79,8 +85,25 @@ module Depix
       magic = data[0..3]
       struct = compact ? CompactDPX : DPX
       
-      template = (magic == "SDPX") ? struct.pattern : make_le(struct.pattern)
-      struct.consume!(data.unpack(template))
+      is_be = (magic == "SDPX")
+      sanity_checker = FileInfo.only(:magic, :version)
+      
+      result = begin
+        if is_be
+          sanity_checker.consume!(data.unpack(sanity_checker.pattern))
+        else
+          sanity_checker.consume!(data.unpack(make_le(sanity_checker.pattern)))
+        end
+      rescue ArgumentError
+        raise InvalidHeader
+      end
+      
+      unless %w( SDPX XPDS).include?(result.magic) && result.version == "V1.0"
+        raise InvalidHeader
+      end
+       
+      template = is_be ? DPX.pattern : make_le(DPX.pattern)
+      struct.consume!(data.unpack(struct.pattern))
     end
     
     # Describe a filled DPX structure

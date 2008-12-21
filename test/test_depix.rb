@@ -81,4 +81,12 @@ class ReaderTest < Test::Unit::TestCase
       assert_match(/Offset to data for this image element/, desc)
     end
   end
+  
+  def test_parsing_something_else_should_raise
+    s = "Mary had a little lamb"
+    assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
+    
+    s = "Mary had a little lamb" * 1000
+    assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
+  end
 end

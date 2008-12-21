@@ -15,5 +15,9 @@ end.parse!
 ARGV.each do | file |
   puts "Describing DPX #{file}. Empty elements are omitted.\n\n"
   puts "===================================================\n\n"
-  puts Depix.describe_file(file, options[:compact])
+  begin
+    puts Depix.describe_file(file, options[:compact])
+  rescue Depix::InvalidHeader
+    puts " - Invalid header data"
+  end
 end
