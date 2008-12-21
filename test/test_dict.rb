@@ -128,9 +128,9 @@ class TestArrayField < Test::Unit::TestCase
     conform_field!(f)
     
     assert_respond_to f, :name=
-
-    assert_raise(NoMethodError) { f.length = 1 }
-    assert_raise(NoMethodError) { f.pattern = 'C' }
+    
+    no_method f, :length=
+    no_method f, :pattern=
   end
   
   def test_array_does_not_allow_setting_length
