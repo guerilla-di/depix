@@ -7,11 +7,11 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
 == Metadata structure
 
 * <tt>file</tt> (Depix::FileInfo) File information:
-  * <tt>magic</tt> (String) Whether the file is BE - required
+  * <tt>magic</tt> (String) Endianness (SDPX is big endian) - required
   * <tt>image_offset</tt> Offset to image data in bytes - required
   * <tt>version</tt> (String) Version of header format - required
   * <tt>file_size</tt> Total image size in bytes - required
-  * <tt>ditto_key</tt> Whether headers change through the sequence
+  * <tt>ditto_key</tt> Whether the basic headers stay the same through the sequence (1 means they do)
   * <tt>generic_size</tt> Generic header length
   * <tt>industry_size</tt> Industry header length
   * <tt>user_size</tt> User header length
@@ -33,7 +33,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
     * <tt>low_quantity</tt> (Float) Reference low quantity represented
     * <tt>high_data</tt> Reference high data code value (1023 for 10bit per channel)
     * <tt>high_quantity</tt> (Float) Reference high quantity represented
-    * <tt>descriptor</tt> (Integer) Descirptor for this image element (ie Video or Film), by enum - required
+    * <tt>descriptor</tt> (Integer) Descriptor for this image element (ie Video or Film), by enum - required
     * <tt>transfer</tt> (Integer) Transfer function (ie Linear), by enum - required
     * <tt>colorimetric</tt> (Integer) Colorimetric (ie YcbCr), by enum - required
     * <tt>bit_size</tt> (Integer) Bit size for element (ie 10) - required
