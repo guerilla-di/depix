@@ -217,6 +217,7 @@ class TestCharField < Test::Unit::TestCase
   def test_char_field_conforms_to_basics
     f = CharField.new :name  => :foo
     conform_field!(f)
+    no_method(f, :pattern=)
   end
   
   def test_char_field_pads

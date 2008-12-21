@@ -146,6 +146,7 @@ module Depix
   
   class CharField < Field
     BLANK = "\0"
+    undef :pattern=
     
     def pattern
       "A#{(length || 1).to_i}"
