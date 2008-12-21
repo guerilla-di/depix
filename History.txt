@@ -1,4 +1,9 @@
+=== 1.0.2 / 2008-12-19
+
+* refactor struct parsing completely
+
 === 1.0.1 / 2008-12-18
+
 * small doc and usability improvements
 
 === 1.0.0 / 2008-12-18
