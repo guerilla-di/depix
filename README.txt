@@ -8,7 +8,7 @@ Read DPX file metadata
 
 == SYNOPSIS:
 
-  meta = Depix::Reader.from_file(dpx_file_path)
+  meta = Depix.from_file(dpx_file_path)
   puts meta.time_code #=> 10:00:00:02
   
 The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. It's
