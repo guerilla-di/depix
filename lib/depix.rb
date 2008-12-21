@@ -57,8 +57,8 @@ module Depix
   end
   
   # Retrurn a formatted description of the DPX file at path. Empty values are omitted.
-  def self.describe_file(path)
-    Reader.new.from_file(path).describe
+  def self.describe_file(path, compact = false)
+    Reader.new.describe_file(path, compact)
   end
   
   class Reader
@@ -66,14 +66,15 @@ module Depix
     # Returns a printable report on all the headers present in the file at the path passed
     def describe_file(path, compact = false)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
-      describe_string(header, compact)
+      describe_struct(parse(header, false))
     end
     
     def from_file(path, compact)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
       parse(header, compact)
     end
-        
+    
+    # The hear of Depix
     def parse(data, compact)
       magic = data[0..3]
       struct = compact ? CompactDPX : DPX
@@ -83,12 +84,27 @@ module Depix
     end
     
     # Describe a filled DPX structure
-    def describe(result)
-      result.class.fields.inject([]) do | information, field |
+    def describe_struct(result, pad_offset = 0)
+      result.class.fields.inject([]) do | info, field |
         value = result.send(field.name)
-        information.merge!(field.name => (field.is_a?(InnerField) ? describe(value) : value)) if value
-        information
-      end
+        parts = []
+        if value
+          parts << field.desc if field.desc
+          parts << if field.is_a?(InnerField)
+            describe_struct(value, pad_offset + 1)
+          elsif field.is_a?(ArrayField)
+            # Exception for image elements
+            value = result.image_elements[0...result.number_elements] if field.name == :image_elements
+            value.map { | v | v.is_a?(Dict) ? describe_struct(v, pad_offset + 2) : v }
+          else
+            value
+          end
+        end
+        if parts.any?
+          info << parts.join(' ')
+        end
+        info
+      end.map{|e| ('  ' * pad_offset) + e }.join("\n")
     end
     
     # Convert an unpack pattern to LE

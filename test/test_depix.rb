@@ -75,6 +75,10 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_describe
-    puts Depix.describe_file(SAMPLE_DPX)
+    assert_nothing_raised do
+      desc =  Depix.describe_file(SAMPLE_DPX)
+      assert_match(/320/, desc)
+      assert_match(/Offset to data for this image element/, desc)
+    end
   end
 end

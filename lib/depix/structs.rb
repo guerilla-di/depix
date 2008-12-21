@@ -4,12 +4,12 @@ require File.dirname(__FILE__) + '/dict'
 module Depix
   
   class FileInfo < Dict
-    char :magic, 4,       :desc => 'Whether the file is BE', :req => true
+    char :magic, 4,       :desc => 'Endianness (SDPX is big endian)', :req => true
     u32  :image_offset,   :desc => 'Offset to image data in bytes', :req => true
     char :version, 8,     :desc => 'Version of header format', :req => true
     
     u32  :file_size,      :desc => "Total image size in bytes", :req => true
-    u32  :ditto_key,      :desc => 'Whether headers change through the sequence'
+    u32  :ditto_key,      :desc => 'Whether the basic headers stay the same through the sequence (1 means they do)'
     u32  :generic_size,   :desc => 'Generic header length'
     u32  :industry_size,  :desc => 'Industry header length'
     u32  :user_size,      :desc => 'User header length'
@@ -53,8 +53,7 @@ module Depix
     r32 :high_quantity, :desc => 'Reference high quantity represented'
     
     # TODO: Autoreplace with enum values. 
-    # Note: with these we will likely be addressing the enums
-    u8 :descriptor,   :desc => 'Descirptor for this image element (ie Video or Film), by enum', :req => true
+    u8 :descriptor,   :desc => 'Descriptor for this image element (ie Video or Film), by enum', :req => true
     u8 :transfer,     :desc => 'Transfer function (ie Linear), by enum', :req => true
     u8 :colorimetric, :desc => 'Colorimetric (ie YcbCr), by enum', :req => true
     u8 :bit_size,     :desc => 'Bit size for element (ie 10)', :req => true

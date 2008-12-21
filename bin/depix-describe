@@ -1,10 +1,19 @@
 #!/usr/bin/env ruby
 
 require File.dirname(__FILE__) + '/../lib/depix'
-if ARGV.flatten.map do | file |
-  data = Depix::Reader.describe_file(file)
-  puts "Describing DPX #{file}. Empty elements are omitted."
-  puts data
-end.empty?
-  STDERR.puts "Usage: depix-describe somefile.dpx anotherfile.dpx"
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: depix-describe somefile.dpx anotherfile.dpx [options]"
+
+  opts.on("-c", "--compact", "Compact output (only fields that change per frame)") do |v|
+    options[:compact] = true
+  end
+end.parse!
+
+ARGV.each do | file |
+  puts "Describing DPX #{file}. Empty elements are omitted.\n\n"
+  puts "===================================================\n\n"
+  puts Depix.describe_file(file, options[:compact])
 end

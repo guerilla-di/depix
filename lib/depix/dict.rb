@@ -139,15 +139,18 @@ module Depix
   end
   
   class CharField < Field
+    BLANK = "\0"
+    
     def pattern
       "A#{(length || 1).to_i}"
     end
     
     def clean(v)
-      begin
-        v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
-      rescue NoMethodError
-        v
+      if v == BLANK
+        nil
+      else
+        cleansed = v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
+        cleansed.empty? ? nil : cleansed
       end
     end
     

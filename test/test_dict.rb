@@ -213,9 +213,14 @@ class TestCharField < Test::Unit::TestCase
     assert_equal String, f.rtype
   end
   
-  def test_char_field_clean
+  def test_char_field_clean_inner_nulls
     f = CharField.new :name => :foo, :length => 15
-    assert_equal "", f.clean("\000")
+    assert_equal "foo", f.clean("\0\0foo")
+  end
+  
+  def test_char_field_clean_blank
+    f = CharField.new :name => :foo, :length => 15
+    assert_equal nil, f.clean("\0")
   end
 end
 
