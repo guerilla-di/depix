@@ -21,7 +21,7 @@ module Depix
     end
     
     def time_code
-      Timecode.from_uint(television.time_code, film.fps)
+      Timecode.from_uint(television.time_code) #, film.frame_rate)
     end
     
     # Get the name of the transfer function (Linear, Logarithmic, ...)
@@ -40,69 +40,61 @@ module Depix
     end
   end
   
-  # Reads the metadata
+  class DPX < Dict
+    include Synthetics
+  end
+  
+  # Return a DPX object describing a file at path.
+  # The second argument specifies whether you need a compact or a full description
+  def self.from_file(path, compact = false)
+    Reader.new.from_file(path, compact)
+  end
+  
+  # Return a DPX object describing headers embedded at the start of the string.
+  # The second argument specifies whether you need a compact or a full description
+  def self.from_string(string, compact = false)
+    Reader.new.parse(string, compact)
+  end
+  
+  # Retrurn a formatted description of the DPX file at path. Empty values are omitted.
+  def self.describe_file(path)
+    Reader.new.from_file(path).describe
+  end
+  
   class Reader
     
-    class << self
-      # Read the header from file (no worries, only the needed number of bytes will be read into memory). Returns a H with the metadata.
-      def from_file(path, compact = false)
-        new.from_file(path, compact)
-      end
-
-      # Read the metadata from an in-memory string. Returns a H with the metadata.
-      def from_string(str, compact = false)
-        new.from_string(str, compact)
-      end
-      
-      # Returns a printable report on all the headers present in the string
-      def describe_string(str, compact = false)
-        reader = new
-        result = reader.deep_parse(str, compact)
-        reader.inform(result)
-      end
-
-      # Returns a printable report on all the headers present in the file at the path passed
-      def describe_file(path, compact = false)
-        header = File.open(path, 'r') { |f| f.read(DPX.length) }
-        describe_string(header, compact)
-      end
+    # Returns a printable report on all the headers present in the file at the path passed
+    def describe_file(path, compact = false)
+      header = File.open(path, 'r') { |f| f.read(DPX.length) }
+      describe_string(header, compact)
     end
     
-    #:stopdoc:
     def from_file(path, compact)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
-      from_string(header, compact)
+      parse(header, compact)
     end
-    
-    def from_string(str, compact) #:nodoc:
-      wrap(deep_parse(str, compact))
-    end
-    
-    def deep_parse(data, compact)
+        
+    def parse(data, compact)
       magic = data[0..3]
       struct = compact ? CompactDPX : DPX
       
       template = (magic == "SDPX") ? struct.pattern : make_le(struct.pattern)
-      result = struct.consume!(data.unpack(template))
+      struct.consume!(data.unpack(template))
     end
     
-    def inform(result)
-      Structs::TEMPLATE_KEYS.zip(result).map{|k, v| "#{k}:#{v}" unless v.nil? }.compact.join("\n")
+    # Describe a filled DPX structure
+    def describe(result)
+      result.class.fields.inject([]) do | information, field |
+        value = result.send(field.name)
+        information.merge!(field.name => (field.is_a?(InnerField) ? describe(value) : value)) if value
+        information
+      end
     end
     
+    # Convert an unpack pattern to LE
     def make_le(pattern)
       pattern.gsub(/n/, "v").gsub(/N/, "V").gsub(/g/, "f")
     end
     
-    def wrap(result)
-      class << result; include Synthetics; end
-      result
-    end
-    
-    def unpad(string) # :nodoc:
-      string.gsub("\000", '').gsub(0xFF.chr, '')
-    end
-    
-    #:startdoc:
   end
 end

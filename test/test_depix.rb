@@ -7,7 +7,7 @@ class ReaderTest < Test::Unit::TestCase
   
   def test_parsed_properly
     file = SAMPLE_DPX
-    parsed = Depix::Reader.from_file(file)
+    parsed = Depix.from_file(file)
     assert_equal "SDPX", parsed.file.magic
     assert_equal 8192, parsed.file.image_offset
     assert_equal "V1.0", parsed.file.version
@@ -39,7 +39,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 0, parsed.image.image_elements[0].end_of_line_padding
     assert_equal 0, parsed.image.image_elements[0].end_of_image_padding
     assert_equal "IMAGE DESCRIPTION DATA        P", parsed.image.image_elements[0].description
-  #  assert_equal "E012x�", parsed.orientation.device - this is where Flame writes the reel
+    assert_equal "E012x\340\264\020\005", parsed.orientation.device #- this is where Flame writes the reel
     assert_equal 853, parsed.orientation.aspect_ratio[0]
     assert_equal 640, parsed.orientation.aspect_ratio[1]
 
@@ -60,17 +60,17 @@ class ReaderTest < Test::Unit::TestCase
     assert_nothing_raised { Depix::Synthetics }
 
     file = SAMPLE_DPX
-    parsed = Depix::Reader.from_file(file)
+    parsed = Depix.from_file(file)
     assert_equal false, parsed.le?
     assert_equal "75 00 19 740612 9841", parsed.keycode
+    assert_equal "01:15:11:18", parsed.time_code.to_s
     assert_equal :RGB, parsed.component_type
     assert_equal :Linear, parsed.colorimetric
-    assert_equal "E012", parsed.flame_reel
+    assert_equal "E012x", parsed.flame_reel
   end
   
   def test_parsed_properly_using_compact_structs
     file = SAMPLE_DPX
-    parsed = Depix::Reader.from_file(file, compact = true)
-    puts parsed.television.inspect
+    assert_nothing_raised { Depix.from_file(file, compact = true) }
   end
 end

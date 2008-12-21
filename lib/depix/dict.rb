@@ -156,6 +156,7 @@ module Depix
     end
   end
   
+  # Wrapper for an array structure
   class ArrayField < Field
     attr_accessor :members
     undef :length=, :pattern=
@@ -184,6 +185,7 @@ module Depix
     end
   end
   
+  # Wrapper for a contained structure
   class InnerField < Field
     attr_accessor :cast
     undef :length=, :pattern=
@@ -211,34 +213,41 @@ module Depix
     
     class << self
       
+      # Get the array of fields defined in this struct
       def fields
         @fields ||= []
       end
-      
+
+      # Define a 4-byte unsigned integer
       def u32(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_u32( {:name => name }.merge(opts) )
       end
 
+      # Define a double-width unsigned integer
       def u16(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_u16( {:name => name }.merge(opts) )
       end
 
+
+      # Define a small unsigned integer
       def u8(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_u8( {:name => name }.merge(opts) )
       end
 
+      # Define a real number
       def r32(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_r32( {:name => name}.merge(opts) )
       end
-      
+
+      # Define an array of values
       def array(name, mapped_to, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
@@ -252,22 +261,26 @@ module Depix
         fields << a
       end
       
+      # Define a nested struct
       def inner(name, mapped_to, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << InnerField.new({:name => name, :cast => mapped_to}.merge(opts))
       end
       
+      # Define a char field
       def char(name, *extras)
         count, opts = count_and_opts_from(extras)
         attr_accessor name
         fields << Field.emit_char( {:name => name, :length => count}.merge(opts) )
       end
       
+      # Get the pattern that will be used to unpack this structure and all of it's descendants
       def pattern
         fields.map{|f| f.pattern }.join
       end
       
+      # How many bytes are needed to complete this structure
       def length
         fields.inject(0){|_, s| _ + s.length }
       end
@@ -281,6 +294,7 @@ module Depix
         new_item
       end
       
+      # Apply this structure to data in the string, returning an instance of this structure with fields completed
       def apply!(string)
         consume!(string.unpack(pattern))
       end
@@ -306,6 +320,8 @@ module Depix
         anon
       end
       
+      # Get an opaque struct based on this one, that will consume exactly as many bytes as this
+      # structure would occupy, but discard them instead
       def filler
         only([])
       end

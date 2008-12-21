@@ -296,12 +296,19 @@ class TestFillerField < Test::Unit::TestCase
     assert_equal "x1", f.pattern
   end
   
-  def test_apply
+  def test_pattern_discards_value
     data = [1,2,3].pack("ccc")
     filler = Filler.new(:length => 3)
     unpacked = data.unpack(filler.pattern)
     assert_equal [], unpacked
   end
+
+  def test_consume_does_not_touch_stack
+    data = [1,2,3]
+    data.freeze
+    assert_nothing_raised { Filler.new(:length => 1).consume(data) }
+  end
+
 end
 
 class TestFieldEmit < Test::Unit::TestCase
