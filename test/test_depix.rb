@@ -4,7 +4,7 @@ require 'test/unit'
 class ReaderTest < Test::Unit::TestCase
   
   SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
-  
+    
   def test_parsed_properly
     file = SAMPLE_DPX
     parsed = Depix.from_file(file)
@@ -38,8 +38,10 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 8192, parsed.image.image_elements[0].data_offset
     assert_equal 0, parsed.image.image_elements[0].end_of_line_padding
     assert_equal 0, parsed.image.image_elements[0].end_of_image_padding
-    assert_equal "IMAGE DESCRIPTION DATA        P", parsed.image.image_elements[0].description
-    assert_equal "E012x\340\264\020\005", parsed.orientation.device #- this is where Flame writes the reel
+    assert_equal "IMAGE DESCRIPTION DATA        \000P", parsed.image.image_elements[0].description
+    assert_equal "E012\000\000\000\000x\340\264\020\000\000\000\000\005\000\000\000\000\000\000\000\377\377\377\377", 
+      parsed.orientation.device #- this is where Flame writes the reel
+    
     assert_equal 853, parsed.orientation.aspect_ratio[0]
     assert_equal 640, parsed.orientation.aspect_ratio[1]
 
@@ -66,7 +68,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal "01:15:11:18", parsed.time_code.to_s
     assert_equal :RGB, parsed.component_type
     assert_equal :Linear, parsed.colorimetric
-    assert_equal "E012x", parsed.flame_reel
+    assert_equal "E012", parsed.flame_reel
   end
   
   def test_parsed_properly_using_compact_structs

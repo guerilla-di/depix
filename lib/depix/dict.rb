@@ -156,7 +156,7 @@ module Depix
       if v == BLANK
         nil
       else
-        cleansed = v.gsub(0xFF.chr, '').gsub(0x00.chr, '')
+        cleansed = v.gsub(/(#{0x00.chr}+)$/, '').gsub(/^(#{0x00.chr}+)/, '')
         cleansed.empty? ? nil : cleansed
       end
     end

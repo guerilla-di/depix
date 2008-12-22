@@ -1,4 +1,4 @@
-(in /Code/libs/depix)
+
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|

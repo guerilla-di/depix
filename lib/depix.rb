@@ -18,8 +18,10 @@ module Depix
       [film.id, film.type, film.offset, film.prefix, film.count].compact.join(' ')
     end
     
+    # Return the flame reel name. The data after the first null byte is not meant to be seen and is used by Flame internally
+    # as it seems
     def flame_reel
-      orientation.device.to_s.scan(/^(\w+)/).to_s
+      orientation.device.split("\000").shift
     end
     
     def time_code
