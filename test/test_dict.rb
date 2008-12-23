@@ -236,6 +236,7 @@ class TestCharField < Test::Unit::TestCase
   def test_char_field_clean_blank
     f = CharField.new :name => :foo, :length => 15
     assert_equal nil, f.clean("\0")
+    assert_equal nil, f.clean("\0\0\0\0\0\0")
   end
 end
 
