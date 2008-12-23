@@ -148,6 +148,11 @@ module Depix
     BLANK = "\0"
     undef :pattern=
     
+    BLANKING_VALUES = [0x00.chr, 0xFF.chr]
+    BLANKING_PATTERNS = BLANKING_VALUES.inject([]) do | p, char |
+      p << /^(#{char}+)/ << /(#{char}+)$/
+    end
+    
     def pattern
       "A#{(length || 1).to_i}"
     end
@@ -156,8 +161,8 @@ module Depix
       if v == BLANK
         nil
       else
-        cleansed = v.gsub(/(#{0x00.chr}+)$/, '').gsub(/^(#{0x00.chr}+)/, '')
-        cleansed.empty? ? nil : cleansed
+        2.times { BLANKING_PATTERNS.each{|p| v.gsub!(p, '')} }
+        v.empty? ? nil : v
       end
     end
     

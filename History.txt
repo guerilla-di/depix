@@ -1,3 +1,7 @@
+=== 1.0.2 / 2008-12-23
+
+* Do not cleanup null bytes and terminators in the middle of char[] attributes (something useful might be in there)
+
 === 1.0.2 / 2008-12-19
 
 * refactor struct parsing completely
