@@ -4,9 +4,24 @@ require 'test/unit'
 include Depix
 
 class BogusError < RuntimeError; end
-class AlwaysInvalid
+
+class AlwaysInvalidField
+  def validate!(value)
+    raise BogusError, "Never valid"
+  end
+  
+  def pack(some_value)
+    raise BogusError, "Will not pack"
+  end
+end
+
+class AlwaysInvalidStruct
   def self.validate!(value)
     raise BogusError, "Never valid"
+  end
+  
+  def self.pack(instance)
+    raise BogusError, "Will not pack"
   end
 end
 
@@ -122,6 +137,11 @@ class TestField < Test::Unit::TestCase
     f.req = true
     assert_raise(RuntimeError) { f.validate! nil }
   end
+  
+  def test_pack_raises
+    f = Field.new
+    assert_raise(RuntimeError) { f.pack("foo")}
+  end
 end
 
 class TestArrayField < Test::Unit::TestCase
@@ -193,6 +213,17 @@ class TestArrayField < Test::Unit::TestCase
     f = ArrayField.new :members => [Field.new(:rtype => self.class)], :req => true
     assert_raise(RuntimeError) { f.validate!([]) }
   end
+  
+  def test_pack_tries_to_pack_inner_structures
+    f = ArrayField.new :members => [AlwaysInvalidField.new]
+    assert_raise(BogusError) { f.pack([1, 2]) }
+  end
+  
+  def test_pack_pads_properly
+    f = ArrayField.new :members => [U32Field.new, R32Field.new, R32Field.new]
+    assert_equal "\000\000\000\001@\000\000\000O\200\000\000", f.pack([1.0, 2.0])
+    assert_equal f.length, f.pack([1.0, 2.0]).length
+  end
 end
 
 class TestInnerField < Test::Unit::TestCase
@@ -248,13 +279,18 @@ class TestInnerField < Test::Unit::TestCase
   end
 
   def test_validate_with_nil_and_no_requirement
-    f = InnerField.new :cast => AlwaysInvalid, :req => true
+    f = InnerField.new :cast => AlwaysInvalidStruct, :req => true
     assert_raise(RuntimeError) { f.validate!(nil) }
   end
   
   def test_validate
-    f = InnerField.new :cast => AlwaysInvalid
-    assert_raise(BogusError) { f.validate!(AlwaysInvalid.new) }
+    f = InnerField.new :cast => AlwaysInvalidStruct
+    assert_raise(BogusError) { f.validate!(AlwaysInvalidStruct.new) }
+  end
+  
+  def test_pack_tries_to_pack_inner_structures
+    f = InnerField.new :cast => AlwaysInvalidStruct
+    assert_raise(BogusError) { f.pack(AlwaysInvalidStruct.new) }
   end
 end
 
@@ -281,6 +317,12 @@ class TestWideIntField < Test::Unit::TestCase
     assert_raise(RuntimeError) { f.validate!(0xFFFFFFFF) }
     assert_nothing_raised { f.validate!(0xFFFFFFFF - 1) }
     
+  end
+  
+  def test_pack
+    w = U32Field.new
+    assert_equal "\000\000\000\036", w.pack(30)
+    assert_equal "\377\377\377\377", w.pack(nil)
   end
 end
 
@@ -326,6 +368,13 @@ class TestCharField < Test::Unit::TestCase
     f = CharField.new :length => 2, :req => true
     assert_raise(RuntimeError) { f.validate!(nil)}
   end
+  
+  def test_char_field_packs
+    f = CharField.new(:length => 6)
+    assert_equal "xx\000\000\000\000", f.pack("xx")
+    assert_equal "\000\000\000\000\000\000", f.pack("")
+    assert_equal "\000\000\000\000\000\000", f.pack(nil)
+  end
 end
 
 class TestFloatField < Test::Unit::TestCase
@@ -344,6 +393,12 @@ class TestFloatField < Test::Unit::TestCase
     assert_equal :foo, f.name
     assert_equal Float, f.rtype
     assert_equal nil, f.clean(the_nan)
+  end
+  
+  def test_pack
+    w = R32Field.new
+    assert_equal "@fff", w.pack(3.6)
+    assert_equal "O\200\000\000", w.pack(nil)
   end
 end
 
@@ -443,7 +498,10 @@ class TestFillerField < Test::Unit::TestCase
     data.freeze
     assert_nothing_raised { Filler.new(:length => 1).consume(data) }
   end
-
+  
+  def test_pack_raises
+    assert_raise(RuntimeError) { Filler.new(:length => 3).pack('xxx') }
+  end
 end
 
 class TestFieldEmit < Test::Unit::TestCase
@@ -543,7 +601,7 @@ class TestDict < Test::Unit::TestCase
   def test_dict_does_not_validate_inner_nil
     wrapper_class = Class.new(Dict) do 
       u32 :bigint
-      inner :invalid, AlwaysInvalid
+      inner :invalid, AlwaysInvalidStruct
     end
     struct = wrapper_class.new
     assert_nothing_raised { wrapper_class.validate!(struct) }
@@ -552,11 +610,11 @@ class TestDict < Test::Unit::TestCase
   def test_dict_calls_validate
     wrapper_class = Class.new(Dict) do 
       u32 :bigint
-      inner :invalid, AlwaysInvalid, :req => true
+      inner :invalid, AlwaysInvalidStruct, :req => true
     end
     
     struct = wrapper_class.new
-    struct.invalid = AlwaysInvalid.new
+    struct.invalid = AlwaysInvalidStruct.new
     
     assert_raise(BogusError) { wrapper_class.validate!(struct) }
   end

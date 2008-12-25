@@ -85,6 +85,13 @@ class ReaderTest < Test::Unit::TestCase
     end
   end
   
+  def test_packing
+    dpx = Depix::DPX.new
+    dpx.file = Depix::FileInfo.new
+    
+    Depix::DPX.pack(dpx)
+  end
+  
   def test_parsing_something_else_should_raise
     s = "Mary had a little lamb"
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }

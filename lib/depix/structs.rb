@@ -127,11 +127,11 @@ module Depix
   
   #:include:DPX_HEADER_STRUCTURE.txt
   class DPX < Dict
-    inner :file, FileInfo,   :desc => "File information"
-    inner :image, ImageInfo, :desc => "Image information"
-    inner :orientation, OrientationInfo, :desc => "Orientation"
-    inner :film, FilmInfo, :desc => "Film industry info"
-    inner :television, TelevisionInfo, :desc => "TV industry info"
-    inner :user, UserInfo, :desc => "User info"
+    inner :file, FileInfo,   :desc => "File information", :req => true
+    inner :image, ImageInfo, :desc => "Image information", :req => true
+    inner :orientation, OrientationInfo, :desc => "Orientation", :req => true
+    inner :film, FilmInfo, :desc => "Film industry info", :req => true
+    inner :television, TelevisionInfo, :desc => "TV industry info", :req => true
+    inner :user, UserInfo, :desc => "User info", :req => true
   end
 end

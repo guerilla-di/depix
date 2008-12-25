@@ -63,6 +63,14 @@ module Depix
     
     # Pack a value passed into a string
     def pack(value)
+      raise "No pattern defined for #{self}" unless pattern
+      begin
+        [value].pack(pattern)
+      rescue ArgumentError
+        "\000" * length
+      rescue TypeError # nil
+        [self.class.const_get(:BLANK)].pack(pattern)
+      end
     end
   end
   
@@ -128,6 +136,10 @@ module Depix
     def consume(stack)
       nil
     end
+    
+    def pack(data)
+      raise "This is a filler, it cannot be reconstructed from a value"
+    end
   end
     
   class U16Field < Field
@@ -158,6 +170,7 @@ module Depix
   
   class R32Field < Field
     undef :length=, :pattern=
+    BLANK = 0xFFFFFFFF
     
     def pattern
       "g"
@@ -206,6 +219,10 @@ module Depix
       super(value)
       raise "#{value} overflows the #{length} bytes allocated" if !value.nil? && value.length > length
     end
+    
+    def pack(value)
+      value.ljust(length, "\000") rescue ("\000" * length)
+    end
   end
   
   # Wrapper for an array structure
@@ -241,6 +258,11 @@ module Depix
       raise "This value is required, but the array is empty" if req? && array.empty?
       array.zip(members).map { | v, m | m.validate!(v) }
     end
+    
+    def pack(array)
+      # For members that are present, get values. For members that are missing, fill with null bytes upto length
+      members.zip(array).map {|m, v| v.respond_to?(:pack) ? v.pack : m.pack(v) }.join
+    end
   end
   
   # Wrapper for a contained structure
@@ -267,6 +289,10 @@ module Depix
     def validate!(value)
       super(value)
       cast.validate!(value) if cast.respond_to?(:validate!) && (!value.nil? || req?)
+    end
+    
+    def pack(value)
+      cast.pack(value)
     end
   end
   
@@ -396,6 +422,39 @@ module Depix
       # structure would occupy, but discard them instead
       def filler
         only([])
+      end
+      
+      # Pack the instance of this struct
+      def pack(instance, buffer = nil)
+        # Preallocate a cerrtain buffer since we want everything to remain at fixed offsets
+        buffer ||= ("\377" * length)
+        
+        # Now for the important stuff. For each field that we have, replace a piece at offsets in the buffer
+        # with the packed results, skipping fillers
+        fields.each_with_index do | f, i |
+          
+          # Skip blanking, we just dont touch it
+          next if f.is_a?(Filler)
+          
+          # Where should we put that value?
+          offset = fields[0...i].inject(0){|s, _| s+ _.length }
+
+          val = instance.send(f.name)
+          
+          # Validate the passed value using the format the field supports
+          begin
+            f.validate!(val)
+          rescue RuntimeError => e
+            raise e, e.message + " - :#{f.name} at byte offset #{offset} (member #{i}) of #{self}"
+          end
+          
+          packed = f.pack(val)
+          
+          # Signal offset violation
+          raise "Improper length" if packed.length != f.length
+
+          buffer[offset..(offset+f.length)] = f.pack(send(f.name))
+        end
       end
       
       private
