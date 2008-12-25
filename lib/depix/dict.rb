@@ -50,6 +50,20 @@ module Depix
     def consume!(stack)
       clean(stack.shift)
     end
+    
+    # Check that the passed value:
+    # a) Matches the Ruby type expected
+    # b) Fits into the slot
+    # c) Does not overflow
+    # When the validation fails should raise
+    def validate!(value)
+      raise "Value required, but got nil" if value.nil? && req?
+      raise "Value expected to be #{rtype} but was #{value.class}" if !value.nil? && rtype && !value.is_a?(rtype)
+    end
+    
+    # Pack a value passed into a string
+    def pack(value)
+    end
   end
   
   class U32Field < Field
@@ -67,6 +81,14 @@ module Depix
     def clean(value)
       value == BLANK ? nil : value
     end
+    
+    # Override - might be Bignum although cast to Integer sometimes
+    def validate!(value)
+      raise "Value required, but got nil" if value.nil? && req?
+      raise "Value expected to be #{rtype} but was #{value.class}" if !value.nil? && (!value.is_a?(Integer) && !value.is_a?(Bignum))
+      raise "Value #{value} not in range" if !value.nil? && (value < 0 || value >= BLANK)
+    end
+    
   end
   
   class U8Field < Field
@@ -88,6 +110,11 @@ module Depix
     
     def clean(v)
       v == BLANK ? nil : v
+    end
+    
+    def validate!(value)
+      super(value)
+      raise "Value #{value} out of bounds for 8 bit unsigned int" if (value < 0 || value >= BLANK)
     end
   end
   
@@ -121,6 +148,11 @@ module Depix
     
     def clean(v)
       v == BLANK ? nil : v
+    end
+    
+    def validate!(value)
+      super(value)
+      raise "Value #{value} out of bounds for 8 bit unsigned int" if (value < 0 || value >= BLANK)
     end
   end
   
@@ -198,6 +230,12 @@ module Depix
       r = (req? ? "- required" : nil)
       [tpl, desc, r].compact.join(' ')
     end
+    
+    def validate!(array)
+      raise "This value would overflow, #{array.length} elements passed but only #{members.length} fit" unless array.length <= members.length
+      raise "This value is required, but the array is empty" if req? && array.empty?
+      array.zip(members).map { | v, m | m.validate!(v) }
+    end
   end
   
   # Wrapper for a contained structure
@@ -220,6 +258,11 @@ module Depix
     def rtype
       cast
     end
+    
+    def validate!(value)
+      super(value)
+      cast.validate!(value) if cast.respond_to?(:validate!) && (!value.nil? || req?)
+    end
   end
   
   # Base class for a struct. Could also be implemented as a module actually
@@ -232,7 +275,14 @@ module Depix
       def fields
         @fields ||= []
       end
-
+      
+      # Validate a passed instance
+      def validate!(instance)
+        fields.each do | f |
+          f.validate!(instance.send(f.name)) if f.name
+        end
+      end
+      
       # Define a 4-byte unsigned integer
       def u32(name, *extras)
         count, opts = count_and_opts_from(extras)

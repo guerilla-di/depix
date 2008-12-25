@@ -3,6 +3,13 @@ require 'test/unit'
 
 include Depix
 
+class BogusError < RuntimeError; end
+class AlwaysInvalid
+  def self.validate!(value)
+    raise BogusError, "Never valid"
+  end
+end
+
 module FieldConformity
   def conform_field!(f)
     assert_respond_to f, :name
@@ -12,6 +19,8 @@ module FieldConformity
     assert_respond_to f, :req?
     assert_respond_to f, :rtype
     assert_respond_to f, :explain
+    assert_respond_to f, :validate!
+    assert_respond_to f, :pack
   end
   
   def assert_method_removed(f, method)
@@ -99,24 +108,19 @@ class TestField < Test::Unit::TestCase
     assert_equal [2,3], ar
   end 
   
-  def test_consume_for_inner_field
-    catcher = Class.new do
-      def self.consume!(arg)
-        raise RuntimeError if arg == ["julik"]
-      end
-    end
+  def test_validate
+    f = Field.new
+    f.rtype = self.class
+    assert_nothing_raised { f.validate! nil }
     
-    f = InnerField.new :cast => catcher
-    assert_respond_to f, :consume!
-    
-    assert_raise(RuntimeError) { f.consume!(["julik"]) }
+    assert_raise(RuntimeError) { f.validate! "boo" }
+    assert_nothing_raised { f.validate! self }
   end
   
-  def test_consume_for_array
-    f = ArrayField.new :members => [Field.new, Field.new]
-    assert_respond_to f, :consume!
-    
-    assert_equal [1,2], f.consume!([1,2])
+  def test_validate_if_required
+    f = Field.new
+    f.req = true
+    assert_raise(RuntimeError) { f.validate! nil }
   end
 end
 
@@ -159,6 +163,36 @@ class TestArrayField < Test::Unit::TestCase
     assert_equal 3, f.length
     assert_equal "CC2", f.pattern
   end
+  
+  def test_consume
+    f = ArrayField.new :members => [Field.new, Field.new]
+    assert_respond_to f, :consume!
+    
+    assert_equal [1,2], f.consume!([1,2])
+  end
+  
+  def test_validate
+    f = ArrayField.new :members => [Field.new(:rtype => self.class)]
+    
+    # Overflow
+    assert_raise(RuntimeError) { f.validate!([nil, nil]) }
+    
+    # Just empty
+    assert_nothing_raised { f.validate!([]) }
+    
+    # Nil vaue
+    assert_nothing_raised { f.validate!([nil]) }
+
+    # type cast
+    assert_raise(RuntimeError) { f.validate!(["nil"]) }
+
+    assert_nothing_raised { f.validate!([self]) }
+  end
+  
+  def test_validate_fails_with_empty_array_and_required_field
+    f = ArrayField.new :members => [Field.new(:rtype => self.class)], :req => true
+    assert_raise(RuntimeError) { f.validate!([]) }
+  end
 end
 
 class TestInnerField < Test::Unit::TestCase
@@ -194,6 +228,34 @@ class TestInnerField < Test::Unit::TestCase
     casted = InnerField.new(:cast => c)
     assert_equal c, casted.rtype
   end
+  
+  def test_consume
+    catcher = Class.new do
+      def self.consume!(arg)
+        raise RuntimeError if arg == ["julik"]
+      end
+    end
+    
+    f = InnerField.new :cast => catcher
+    assert_respond_to f, :consume!
+    
+    assert_raise(RuntimeError) { f.consume!(["julik"]) }
+  end
+  
+  def test_validate_with_nil_and_no_requirement
+    f = InnerField.new :cast => AlwaysInvalid
+    assert_nothing_raised { f.validate!(nil) }
+  end
+
+  def test_validate_with_nil_and_no_requirement
+    f = InnerField.new :cast => AlwaysInvalid, :req => true
+    assert_raise(RuntimeError) { f.validate!(nil) }
+  end
+  
+  def test_validate
+    f = InnerField.new :cast => AlwaysInvalid
+    assert_raise(BogusError) { f.validate!(AlwaysInvalid.new) }
+  end
 end
 
 class TestWideIntField < Test::Unit::TestCase
@@ -208,6 +270,17 @@ class TestWideIntField < Test::Unit::TestCase
     assert_equal :foo, f.name
     assert_equal 66, f.clean(66)
     assert_equal nil, f.clean(0xFFFFFFFF)
+  end
+  
+  def test_validate
+    f = U32Field.new
+    
+    assert_nothing_raised { f.validate! 8 }
+    assert_nothing_raised { f.validate! 0 }
+    assert_nothing_raised { f.validate!  65536 }
+    assert_raise(RuntimeError) { f.validate!(0xFFFFFFFF) }
+    assert_nothing_raised { f.validate!(0xFFFFFFFF - 1) }
+    
   end
 end
 
@@ -272,7 +345,6 @@ class TestSmallintField < Test::Unit::TestCase
     
     assert_method_removed(f, :pattern=)
     assert_method_removed(f, :length=)
-    
   end
   
   def test_smallint_operation
@@ -285,11 +357,18 @@ class TestSmallintField < Test::Unit::TestCase
   
   def test_smallint_clean
     f = U8Field.new
-    
     assert_equal nil, f.clean(0xFF)
     assert_equal 10, f.clean(10)
   end
   
+  def test_validate
+    f = U8Field.new
+    assert_nothing_raised { f.validate! 8 }
+    assert_nothing_raised { f.validate! 0 }
+    assert_raise(RuntimeError) { f.validate! -1 }
+    assert_raise(RuntimeError) { f.validate! 255 }
+    assert_raise(RuntimeError) { f.validate! 256 }
+  end
 end
 
 class TestDoubleField < Test::Unit::TestCase
@@ -316,6 +395,15 @@ class TestDoubleField < Test::Unit::TestCase
     
     assert_equal nil, f.clean(0xFFFF)
     assert_equal 10, f.clean(10)
+  end
+  
+  def test_validate
+    f = U16Field.new
+    assert_nothing_raised { f.validate! 8 }
+    assert_nothing_raised { f.validate! 0 }
+    assert_raise(RuntimeError) { f.validate! -1 }
+    assert_raise(RuntimeError) { f.validate!  65535 }
+    assert_raise(RuntimeError) { f.validate!  65536 }
   end
 end
 
@@ -401,6 +489,12 @@ class TestDict < Test::Unit::TestCase
     assert_equal [], dict_class.fields
   end
   
+  def test_dict_responds_to_validate
+    dict_class = Class.new(Dict)
+    assert_respond_to dict_class, :validate!
+    one = dict_class.new
+  end
+  
   def test_dict_fields_array_not_class_shared
     d1, d2 = (0..1).map{|_| Class.new(Dict) }
     
@@ -434,7 +528,27 @@ class TestDict < Test::Unit::TestCase
     assert_equal 'A1A1', c.pattern
     assert_equal 2, c.length
   end
+
+  def test_dict_does_not_validate_inner_nil
+    wrapper_class = Class.new(Dict) do 
+      u32 :bigint
+      inner :invalid, AlwaysInvalid
+    end
+    struct = wrapper_class.new
+    assert_nothing_raised { wrapper_class.validate!(struct) }
+  end
   
+  def test_dict_calls_validate
+    wrapper_class = Class.new(Dict) do 
+      u32 :bigint
+      inner :invalid, AlwaysInvalid, :req => true
+    end
+    
+    struct = wrapper_class.new
+    struct.invalid = AlwaysInvalid.new
+    
+    assert_raise(BogusError) { wrapper_class.validate!(struct) }
+  end
 end
 
 class TestDictConsume < Test::Unit::TestCase
