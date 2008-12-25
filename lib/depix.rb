@@ -1,4 +1,3 @@
-require 'stringio'
 require 'rubygems'
 require 'timecode'
 
