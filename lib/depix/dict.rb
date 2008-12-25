@@ -201,6 +201,11 @@ module Depix
     def rtype
       String
     end
+    
+    def validate!(value)
+      super(value)
+      raise "#{value} overflows the #{length} bytes allocated" if !value.nil? && value.length > length
+    end
   end
   
   # Wrapper for an array structure

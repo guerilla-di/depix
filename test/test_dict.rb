@@ -313,7 +313,18 @@ class TestCharField < Test::Unit::TestCase
     assert_equal nil, f.clean("\0\0\0\0\0\0")
     assert_equal nil, f.clean("\0\0\0\377\377\0\0\0")
     assert_equal "foo\0foo", f.clean("\0\0foo\0foo\0")
-
+  end
+  
+  def test_char_field_validates_overflow
+    f = CharField.new :length => 2
+    assert_raise(RuntimeError) { f.validate!("xxx")}
+    assert_nothing_raised { f.validate!("xx")}
+    assert_nothing_raised { f.validate!(nil)}
+  end
+  
+  def test_char_field_validates_required_with_nil
+    f = CharField.new :length => 2, :req => true
+    assert_raise(RuntimeError) { f.validate!(nil)}
   end
 end
 
