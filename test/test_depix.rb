@@ -86,9 +86,8 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_packing
-    dpx = Depix::DPX.new
-    dpx.file = Depix::FileInfo.new
-    
+    dpx = Depix.from_file(SAMPLE_DPX)
+#puts dpx.image.image_elements[0].data_sign    
     Depix::DPX.pack(dpx)
   end
   

@@ -121,7 +121,11 @@ module Depix
     
     u32 :pixels_per_line,                   :desc => 'Pixels per horizontal line', :req => true
     u32 :lines_per_element,                 :desc => 'Line count', :req => true
-    array :image_elements, ImageElement, 8, :desc => "Image elements"
+    
+    array :image_elements, ImageElement, 8, :desc => "Image elements" do | elements |
+      elements[0].req = true
+    end
+    
     char :reserve, 52
   end
   

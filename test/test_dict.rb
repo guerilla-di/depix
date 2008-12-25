@@ -5,7 +5,7 @@ include Depix
 
 class BogusError < RuntimeError; end
 
-class AlwaysInvalidField
+class AlwaysInvalidField < Field
   def validate!(value)
     raise BogusError, "Never valid"
   end
@@ -213,6 +213,12 @@ class TestArrayField < Test::Unit::TestCase
     f = ArrayField.new :members => [Field.new(:rtype => self.class)], :req => true
     assert_raise(RuntimeError) { f.validate!([]) }
   end
+  
+  def test_validate_does_not_validate_inner_structure_if_no_value_present_and_field_is_not_required
+    f = ArrayField.new :members => [AlwaysInvalidField.new]
+    assert_nothing_raised { f.validate! [nil] }
+  end
+  
   
   def test_pack_tries_to_pack_inner_structures
     f = ArrayField.new :members => [AlwaysInvalidField.new]
@@ -631,6 +637,10 @@ class TestDictConsume < Test::Unit::TestCase
     
     assert_equal "a", result.foo
     assert_equal "b", result.bar
+  end
+  
+  def test_dict_with_pure_filler_consumes_as_nil
+    flunk
   end
 end
 

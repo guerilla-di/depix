@@ -57,7 +57,7 @@ module Depix
     # c) Does not overflow
     # When the validation fails should raise
     def validate!(value)
-      raise "Value required, but got nil" if value.nil? && req?
+      raise "#{name} value required, but got nil in #{name}".strip if value.nil? && req?
       raise "Value expected to be #{rtype} but was #{value.class}" if !value.nil? && rtype && !value.is_a?(rtype)
     end
     
@@ -92,9 +92,9 @@ module Depix
     
     # Override - might be Bignum although cast to Integer sometimes
     def validate!(value)
-      raise "Value required, but got nil" if value.nil? && req?
-      raise "Value expected to be #{rtype} but was #{value.class}" if !value.nil? && (!value.is_a?(Integer) && !value.is_a?(Bignum))
-      raise "Value #{value} not in range" if !value.nil? && (value < 0 || value >= BLANK)
+      raise "#{name} value required, but got nil".strip if value.nil? && req?
+      raise "#{name} value expected to be #{rtype} but was #{value.class}" if !value.nil? && (!value.is_a?(Integer) && !value.is_a?(Bignum))
+      raise "#{name} value #{value} overflows" if !value.nil? && (value < 0 || value >= BLANK)
     end
     
   end
@@ -256,7 +256,9 @@ module Depix
     def validate!(array)
       raise "This value would overflow, #{array.length} elements passed but only #{members.length} fit" unless array.length <= members.length
       raise "This value is required, but the array is empty" if req? && array.empty?
-      array.zip(members).map { | v, m | m.validate!(v) }
+      array.zip(members).map do | v, m | 
+        m.validate!(v) unless (v.nil? && !m.req?)
+      end
     end
     
     def pack(array)
@@ -354,6 +356,7 @@ module Depix
         else
           [Field.send("emit_#{mapped_to}")] * count
         end
+        yield a.members if block_given?
         fields << a
       end
       
@@ -437,24 +440,25 @@ module Depix
           next if f.is_a?(Filler)
           
           # Where should we put that value?
-          offset = fields[0...i].inject(0){|s, _| s+ _.length }
+          offset = fields[0...i].inject(0){|_, s| _ + s.length }
 
           val = instance.send(f.name)
-          
+
           # Validate the passed value using the format the field supports
-          begin
+#          begin
             f.validate!(val)
-          rescue RuntimeError => e
-            raise e, e.message + " - :#{f.name} at byte offset #{offset} (member #{i}) of #{self}"
-          end
+#          rescue RuntimeError => e
+#            raise e, e.message + " - :#{f.name} at byte offset #{offset} (member #{i}) of #{self}"
+#          end
           
           packed = f.pack(val)
           
           # Signal offset violation
-          raise "Improper length" if packed.length != f.length
+          raise "Improper length for #{f.name} - packed #{packed.length} bytes but #{f.length} is required to fill the slot" if packed.length != f.length
 
-          buffer[offset..(offset+f.length)] = f.pack(send(f.name))
+          buffer[offset..(offset+f.length)] = packed
         end
+        buffer
       end
       
       private
