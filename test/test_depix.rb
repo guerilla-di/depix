@@ -86,10 +86,9 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_packing
-    original_header = File.read(SAMPLE_DPX)[0..Depix::DPX.length]
+    original_header = File.read(SAMPLE_DPX)[0...Depix::DPX.length]
 
     dpx = Depix.from_string(original_header)
-
     packed =  Depix::DPX.pack(dpx, original_header.dup)
     
     dpx2 = Depix.from_string(packed)

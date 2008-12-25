@@ -64,12 +64,10 @@ module Depix
     # Pack a value passed into a string
     def pack(value)
       raise "No pattern defined for #{self}" unless pattern
-      begin
-        [value].pack(pattern)
-      rescue ArgumentError
-        "\000" * length
-      rescue TypeError # nil
+      if value.nil?
         [self.class.const_get(:BLANK)].pack(pattern)
+      else
+        [value].pack(pattern)
       end
     end
   end
