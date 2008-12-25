@@ -445,11 +445,7 @@ module Depix
           val = instance.send(f.name)
 
           # Validate the passed value using the format the field supports
-#          begin
-            f.validate!(val)
-#          rescue RuntimeError => e
-#            raise e, e.message + " - :#{f.name} at byte offset #{offset} (member #{i}) of #{self}"
-#          end
+          f.validate!(val)
           
           packed = f.pack(val)
           
