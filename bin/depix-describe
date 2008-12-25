@@ -10,13 +10,24 @@ OptionParser.new do |opts|
   opts.on("-c", "--compact", "Compact output (only fields that change per frame)") do |v|
     options[:compact] = true
   end
+
+  opts.on("-s", "--synthetics", "Output only synthetic fields (like time code and aspect)") do |v|
+    options[:synthetics] = true
+  end
+
 end.parse!
 
 ARGV.each do | file |
-  puts "Describing DPX #{file}. Empty elements are omitted.\n\n"
-  puts "===================================================\n\n"
+  puts "Describing DPX #{file}. Empty elements are omitted."
+  puts "===================================================\n"
   begin
-    puts Depix.describe_file(file, options[:compact])
+    if options[:synthetics]
+      puts Depix.describe_brief(file)
+    elsif options[:compact]
+      puts Depix.describe_file(file, true)
+    else
+      puts Depix.describe_file(file)
+    end
   rescue Depix::InvalidHeader
     puts " - Invalid header data"
   end

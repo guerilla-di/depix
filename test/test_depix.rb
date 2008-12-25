@@ -69,6 +69,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal :RGB, parsed.component_type
     assert_equal :Linear, parsed.colorimetric
     assert_equal "E012", parsed.flame_reel
+    assert_equal "1.33", parsed.aspect
   end
   
   def test_parsed_properly_using_compact_structs

@@ -14,6 +14,7 @@ module Depix
   
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
+    
     def keycode
       [film.id, film.type, film.offset, film.prefix, film.count].compact.join(' ')
     end
@@ -21,7 +22,7 @@ module Depix
     # Return the flame reel name. The data after the first null byte is not meant to be seen and is used by Flame internally
     # as it seems
     def flame_reel
-      orientation.device.split("\000").shift
+      orientation.device.split(0x00.chr).shift
     end
     
     def time_code
@@ -36,6 +37,11 @@ module Depix
     # Get the name of the compnent type (RGB, YCbCr, ...)
     def component_type
       COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
+    end
+    
+    # Aspect in it's traditional repr
+    def aspect
+      "%.2f" % (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
     end
     
     # Is this DPX file little-endian? This would be an exception, but still useful
@@ -65,12 +71,24 @@ module Depix
     Reader.new.describe_file(path, compact)
   end
   
+  # Return a formatted description of the DPX file at path, showing only synthetic attributes
+  def self.describe_brief(path)
+    Reader.new.describe_synthetics_of_struct(from_file(path))
+  end
+  
   class Reader
     
     # Returns a printable report on all the headers present in the file at the path passed
     def describe_file(path, compact = false)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
-      describe_struct(parse(header, false))
+      struct = parse(header, false)
+      describe_struct(struct) + describe_synthetics_of_struct(struct)
+    end
+    
+    def describe_synthetics_of_struct(struct)
+      Synthetics.instance_methods.reject{|m| m.include?('=')}.map do | m |
+        [m, struct.send(m)].join(' : ')
+      end.unshift("============").unshift("\nSynthetic properties").join("\n")
     end
     
     def from_file(path, compact)
