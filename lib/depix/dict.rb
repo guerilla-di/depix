@@ -117,12 +117,12 @@ module Depix
     end
     
     def clean(v)
-      v == BLANK ? nil : v
+      (v == BLANK || v == -1) ? nil : v
     end
     
     def validate!(value)
       super(value)
-      raise "Value #{value} out of bounds for 8 bit unsigned int" if (value < 0 || value >= BLANK)
+      raise "#{name} value #{value} out of bounds for 8 bit unsigned int".lstrip if (!value.nil? && (value < 0 || value >= BLANK))
     end
   end
   
@@ -164,7 +164,7 @@ module Depix
     
     def validate!(value)
       super(value)
-      raise "Value #{value} out of bounds for 8 bit unsigned int" if (value < 0 || value >= BLANK)
+      raise "#{name} value #{value} out of bounds for 16bit unsigned int" if (value < 0 || value >= BLANK)
     end
   end
   
@@ -261,9 +261,17 @@ module Depix
       end
     end
     
-    def pack(array)
-      # For members that are present, get values. For members that are missing, fill with null bytes upto length
-      members.zip(array).map {|m, v| v.respond_to?(:pack) ? v.pack : m.pack(v) }.join
+    def pack(values)
+      # For members that are present, get values. For members that are missing, fill with null bytes upto length.
+      # For values that are nil, skip packing
+      members.zip(values).map do |m, v| 
+        if !m.req? && v.nil?
+          raise "#{m} needs to provide length" unless m.length
+          "\377" * m.length
+        else
+          v.respond_to?(:pack) ? v.pack : m.pack(v)
+        end
+      end.join
     end
   end
   
@@ -432,11 +440,13 @@ module Depix
         # Preallocate a cerrtain buffer since we want everything to remain at fixed offsets
         buffer ||= ("\377" * length)
         
+        return buffer if instance.nil?
+        
         # Now for the important stuff. For each field that we have, replace a piece at offsets in the buffer
         # with the packed results, skipping fillers
         fields.each_with_index do | f, i |
           
-          # Skip blanking, we just dont touch it
+          # Skip blanking, we just dont touch it. TODO - test!
           next if f.is_a?(Filler)
           
           # Where should we put that value?
@@ -452,8 +462,9 @@ module Depix
           # Signal offset violation
           raise "Improper length for #{f.name} - packed #{packed.length} bytes but #{f.length} is required to fill the slot" if packed.length != f.length
 
-          buffer[offset..(offset+f.length)] = packed
+          buffer[offset...(offset+f.length)] = packed
         end
+        raise "Resulting buffer not the same length, expected #{length} bytes but compued #{buffer.length}" if buffer.length != length
         buffer
       end
       

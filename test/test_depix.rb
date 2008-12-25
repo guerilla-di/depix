@@ -86,9 +86,14 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_packing
-    dpx = Depix.from_file(SAMPLE_DPX)
-#puts dpx.image.image_elements[0].data_sign    
-    Depix::DPX.pack(dpx)
+    original_header = File.read(SAMPLE_DPX)[0..Depix::DPX.length]
+
+    dpx = Depix.from_string(original_header)
+
+    packed =  Depix::DPX.pack(dpx, original_header.dup)
+    
+    dpx2 = Depix.from_string(packed)
+    assert_equal packed, original_header, "The packed version of the header should be exactly the same"
   end
   
   def test_parsing_something_else_should_raise

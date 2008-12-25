@@ -127,6 +127,11 @@ module Depix
     end
     
     char :reserve, 52
+    
+    # Only expose the elements present
+    def image_elements #:nodoc:
+      @image_elements[0...number_elements]
+    end
   end
   
   #:include:DPX_HEADER_STRUCTURE.txt

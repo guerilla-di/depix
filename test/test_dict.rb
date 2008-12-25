@@ -227,9 +227,15 @@ class TestArrayField < Test::Unit::TestCase
   
   def test_pack_pads_properly
     f = ArrayField.new :members => [U32Field.new, R32Field.new, R32Field.new]
-    assert_equal "\000\000\000\001@\000\000\000O\200\000\000", f.pack([1.0, 2.0])
+    assert_equal "\000\000\000\001@\000\000\000\377\377\377\377", f.pack([1.0, 2.0])
     assert_equal f.length, f.pack([1.0, 2.0]).length
   end
+
+  def test_does_not_try_to_pack_nil_values
+    f = ArrayField.new(:members => [AlwaysInvalidField.new(:length => 2)])
+    assert_equal "\377\377", f.pack([])
+  end
+
 end
 
 class TestInnerField < Test::Unit::TestCase
@@ -639,9 +645,6 @@ class TestDictConsume < Test::Unit::TestCase
     assert_equal "b", result.bar
   end
   
-  def test_dict_with_pure_filler_consumes_as_nil
-    flunk
-  end
 end
 
 class TestDictEmitDSL < Test::Unit::TestCase
