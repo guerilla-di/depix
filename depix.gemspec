@@ -1,19 +1,19 @@
-
+(in /Code/libs/depix)
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
   s.name = %q{depix}
-  s.version = "1.0.2"
+  s.version = "1.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
-  s.date = %q{2008-12-22}
+  s.date = %q{2008-12-26}
   s.default_executable = %q{depix-describe}
   s.description = %q{Read DPX file metadata}
   s.email = ["me@julik.nl"]
   s.executables = ["depix-describe"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt", "DPX_HEADER_STRUCTURE.txt"]
-  s.files = ["History.txt", "Manifest.txt", "README.txt", "DPX_HEADER_STRUCTURE.txt", "Rakefile", "bin/depix-describe", "lib/depix.rb", "lib/depix/struct_explainer.rb", "lib/depix/structs.rb", "lib/depix/compact_structs.rb", "lib/depix/enums.rb", "lib/depix/dict.rb", "test/test_depix.rb", "test/samples/E012_P001_L000002_lin.0001.dpx", "test/samples/E012_P001_L000002_lin.0002.dpx", "test/samples/E012_P001_L000002_log.0001.dpx", "test/samples/E012_P001_L000002_log.0002.dpx", "test/test_dict.rb"]
+  s.files = ["History.txt", "Manifest.txt", "README.txt", "DPX_HEADER_STRUCTURE.txt", "Rakefile", "bin/depix-describe", "lib/depix.rb", "lib/depix/struct_explainer.rb", "lib/depix/structs.rb", "lib/depix/benchmark.rb", "lib/depix/compact_structs.rb", "lib/depix/enums.rb", "lib/depix/dict.rb", "lib/depix/reader.rb", "lib/depix/editor.rb", "test/test_dict.rb", "test/test_depix.rb", "test/samples/E012_P001_L000002_lin.0001.dpx", "test/samples/E012_P001_L000002_lin.0002.dpx", "test/samples/E012_P001_L000002_log.0001.dpx", "test/samples/E012_P001_L000002_log.0002.dpx"]
   s.has_rdoc = true
   s.homepage = %q{http://wiretap.rubyforge.org/depix}
   s.rdoc_options = ["--main", "README.txt"]

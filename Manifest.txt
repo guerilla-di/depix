@@ -7,9 +7,13 @@ bin/depix-describe
 lib/depix.rb
 lib/depix/struct_explainer.rb
 lib/depix/structs.rb
+lib/depix/benchmark.rb
 lib/depix/compact_structs.rb
 lib/depix/enums.rb
 lib/depix/dict.rb
+lib/depix/reader.rb
+lib/depix/editor.rb
+test/test_dict.rb
 test/test_depix.rb
 test/samples/E012_P001_L000002_lin.0001.dpx
 test/samples/E012_P001_L000002_lin.0002.dpx

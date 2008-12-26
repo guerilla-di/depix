@@ -4,12 +4,22 @@
 
 == DESCRIPTION:
 
-Read DPX file metadata
+Read and write DPX file metadata
 
 == SYNOPSIS:
 
+Reading headers
+
   meta = Depix.from_file(dpx_file_path)
   puts meta.time_code #=> 10:00:00:02
+
+Writing headers
+  
+  editor = Depix::Editor.new(dpx_file_path)
+
+  # Advance the time code by one frame and save
+  editor.headers.time_code = editor.headers.time_code + 1
+  editor.commit!
   
 The data returned is described in the DPX_HEADER_STRUCTURE[link:files/DPX_HEADER_STRUCTURE_txt.html]. It's
 a vanilla Ruby object with no extra methods except for the readers that have the same name as the specified
@@ -19,11 +29,15 @@ The gem also contains an executable called depix-desribe which can be used from 
   
   $book depix-describe 001_PTAPE_001.001.dpx
 
+for a long description or 
+
+  $book depix-describe -s 001_PTAPE_001.001.dpx 
+
+for a short description
+
 == NOTES:
 
-In the future there will be a possibility to modify and commit the headers, but it's not a priority at this time.
-
-Autodesk IFFS systems write the reel name for the file to the orientation.device field
+Autodesk IFFS systems write the reel name for the file to the orientation.device field, some scanners write it into user data.
 
 == REQUIREMENTS:
 
