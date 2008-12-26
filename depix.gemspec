@@ -1,6 +1,3 @@
-(in /Code/libs/depix)
-# -*- encoding: utf-8 -*-
-
 Gem::Specification.new do |s|
   s.name = %q{depix}
   s.version = "1.0.3"
