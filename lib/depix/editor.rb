@@ -10,15 +10,15 @@ module Depix
     end
     
     # Save the header to disk
-    def commit_header(header)
-      packed = DPX.pack(header)
-      # Validate that we can unpack first - what if something went wrong?
-      DPX.apply(packed)
-      
-      File.open(@path, 'rb+') do | f |
-        f.seek(0, )
-        f.write(DPX.pack(header))
-      end
-    end
+ # def commit_header(header)
+ #   packed = DPX.pack(header)
+ #   # Validate that we can unpack first - what if something went wrong?
+ #   DPX.apply(packed)
+ #   
+ #   File.open(@path, 'rb+') do | f |
+ #     f.seek(0)
+ #     f.write(DPX.pack(header))
+ #   end
+ # end
   end
 end

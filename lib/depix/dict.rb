@@ -435,9 +435,11 @@ module Depix
       
       # Pack the instance of this struct
       def pack(instance, buffer = nil)
-        # Preallocate a cerrtain buffer since we want everything to remain at fixed offsets
+        
+        # Preallocate a buffer just as big as me since we want everything to remain at fixed offsets
         buffer ||= ("\377" * length)
         
+        # If the instance is nil return pure padding
         return buffer if instance.nil?
         
         # Now for the important stuff. For each field that we have, replace a piece at offsets in the buffer

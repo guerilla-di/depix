@@ -286,11 +286,6 @@ class TestInnerField < Test::Unit::TestCase
   end
   
   def test_validate_with_nil_and_no_requirement
-    f = InnerField.new :cast => AlwaysInvalid
-    assert_nothing_raised { f.validate!(nil) }
-  end
-
-  def test_validate_with_nil_and_no_requirement
     f = InnerField.new :cast => AlwaysInvalidStruct, :req => true
     assert_raise(RuntimeError) { f.validate!(nil) }
   end
@@ -443,9 +438,9 @@ class TestSmallintField < Test::Unit::TestCase
     f = U8Field.new
     assert_nothing_raised { f.validate! 8 }
     assert_nothing_raised { f.validate! 0 }
-    assert_raise(RuntimeError) { f.validate! -1 }
-    assert_raise(RuntimeError) { f.validate! 255 }
-    assert_raise(RuntimeError) { f.validate! 256 }
+    assert_raise(RuntimeError) { f.validate!( -1 ) }
+    assert_raise(RuntimeError) { f.validate!( 255) }
+    assert_raise(RuntimeError) { f.validate!( 256) }
   end
 end
 
@@ -479,9 +474,9 @@ class TestDoubleField < Test::Unit::TestCase
     f = U16Field.new
     assert_nothing_raised { f.validate! 8 }
     assert_nothing_raised { f.validate! 0 }
-    assert_raise(RuntimeError) { f.validate! -1 }
-    assert_raise(RuntimeError) { f.validate!  65535 }
-    assert_raise(RuntimeError) { f.validate!  65536 }
+    assert_raise(RuntimeError) { f.validate!( -1) }
+    assert_raise(RuntimeError) { f.validate!(  65535) }
+    assert_raise(RuntimeError) { f.validate!(  65536) }
   end
 end
 
