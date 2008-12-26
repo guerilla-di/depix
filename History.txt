@@ -1,6 +1,7 @@
-=== 1.0.4 / 2008-12-23
+=== 1.0.4 / 2008-12-25
 
 * Add brief inspect
+* Add metadata editing
 
 === 1.0.3 / 2008-12-23
 
