@@ -437,7 +437,7 @@ module Depix
       def pack(instance, buffer = nil)
         
         # Preallocate a buffer just as big as me since we want everything to remain at fixed offsets
-        buffer ||= ("\377" * length)
+        buffer ||= ("\000" * length)
         
         # If the instance is nil return pure padding
         return buffer if instance.nil?

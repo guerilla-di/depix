@@ -27,8 +27,18 @@ module Depix
       orientation.device.split(0x00.chr).shift
     end
     
+    # Assign reel name
+    def flame_reel=(new_reel)
+      orientation.device = new_reel
+    end
+    
     def time_code
       Timecode.from_uint(television.time_code) #, film.frame_rate)
+    end
+    
+    # Assign frame rate and timecode from a Timecode object
+    def time_code=(new_tc)
+      television.time_code, film.frame_rate = new_tc.to_uint, new_tc.fps
     end
     
     # Get the name of the transfer function (Linear, Logarithmic, ...)

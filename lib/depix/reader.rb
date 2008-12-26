@@ -19,7 +19,7 @@ module Depix
       begin
         parse(header, compact)
       rescue InvalidHeader => e
-        raise InvalidHeader, "Invalid header in file #{path}"
+        raise InvalidHeader, "Invalid header in file #{path} - #{e.message}"
       end
     end
   
@@ -27,7 +27,7 @@ module Depix
     def parse(data, compact)
       magic = data[0..3]
     
-      raise InvalidHeader unless %w( SDPX XPDS).include?(magic)
+      raise InvalidHeader, "No magic bytes found at start" unless %w( SDPX XPDS).include?(magic)
     
       struct = compact ? CompactDPX : DPX
     
@@ -44,7 +44,7 @@ module Depix
         raise InvalidHeader
       end
     
-      raise InvalidHeader unless result.version == "V1.0"
+      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version == "V1.0"
      
       template = is_be ? DPX.pattern : make_le(DPX.pattern)
       struct.consume!(data.unpack(struct.pattern))

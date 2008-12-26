@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/../lib/depix'
 require 'test/unit'
 
+SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
+
 class ReaderTest < Test::Unit::TestCase
   
-  SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
-    
   def test_parsed_properly
     file = SAMPLE_DPX
     parsed = Depix.from_file(file)
@@ -106,5 +106,30 @@ class ReaderTest < Test::Unit::TestCase
     s = "SDPX Mary had a little lamb" * 1000
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
 
+  end
+end
+
+class EditorTest < Test::Unit::TestCase
+  def test_instantiation
+    e = Depix::Editor.new(SAMPLE_DPX)
+    assert_not_nil e
+    assert_equal SAMPLE_DPX, e.path
+    assert_not_nil e.headers
+  end
+  
+  def test_commit
+    temp_path = SAMPLE_DPX + ".test"
+    begin
+      FileUtils.cp(SAMPLE_DPX, temp_path)
+      e  = Depix::Editor.new(temp_path)
+      e.headers.orientation.device = "E013"
+
+      assert_nothing_raised { e.commit! }
+
+      re_read = Depix.from_file(temp_path)
+      assert_equal "E013", re_read.orientation.device
+    ensure
+      File.unlink(temp_path)
+    end
   end
 end
