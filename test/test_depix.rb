@@ -43,7 +43,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 8192,  ie.data_offset
     assert_equal 0,     ie.end_of_line_padding
     assert_equal 0,     ie.end_of_image_padding
-    assert_equal "IMAGE DESCRIPTION DATA        \000P", parsed.image.image_elements[0].description
+    assert_equal "IMAGE DESCRIPTION DATA        \000P", ie.description
     assert_equal "E012\000\000\000\000x\340\264\020\000\000\000\000\005", 
       parsed.orientation.device #- this is where Flame writes the reel
     
