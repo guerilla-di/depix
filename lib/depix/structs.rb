@@ -15,7 +15,7 @@ module Depix
     u32  :user_size,      :desc => 'User header length'
     
     char :filename, 100,  :desc => 'Original filename'
-    char :timestamp, 24,  :desc => 'Creation 15'
+    char :timestamp, 24,  :desc => 'Creation timestamp'
     char :creator, 100,   :desc => 'Creator application'
     char :roject, 200,    :desc => 'Project name'
     char :copyright, 200, :desc => 'Copyright'
