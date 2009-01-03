@@ -6,7 +6,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
 
 == Metadata structure
 
-* <tt>file</tt> (Depix::FileInfo) File information:
+* <tt>file</tt> (Depix::FileInfo) File information - required:
   * <tt>magic</tt> (String) Endianness (SDPX is big endian) - required
   * <tt>image_offset</tt> Offset to image data in bytes - required
   * <tt>version</tt> (String) Version of header format - required
@@ -16,13 +16,13 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
   * <tt>industry_size</tt> Industry header length
   * <tt>user_size</tt> User header length
   * <tt>filename</tt> (String) Original filename
-  * <tt>timestamp</tt> (String) Creation 15
+  * <tt>timestamp</tt> (String) Creation timestamp
   * <tt>creator</tt> (String) Creator application
   * <tt>roject</tt> (String) Project name
   * <tt>copyright</tt> (String) Copyright
   * <tt>encrypt_key</tt> Encryption key
   * <tt>reserve</tt> (String)
-* <tt>image</tt> (Depix::ImageInfo) Image information:
+* <tt>image</tt> (Depix::ImageInfo) Image information - required:
   * <tt>orientation</tt> (Integer) Orientation descriptor - required
   * <tt>number_elements</tt> (Integer) How many elements to scan - required
   * <tt>pixels_per_line</tt> Pixels per horizontal line - required
@@ -44,7 +44,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
     * <tt>end_of_image_padding</tt> End-of-line padding for this image element
     * <tt>description</tt> (String)
   * <tt>reserve</tt> (String)
-* <tt>orientation</tt> (Depix::OrientationInfo) Orientation:
+* <tt>orientation</tt> (Depix::OrientationInfo) Orientation - required:
   * <tt>x_offset</tt> 
   * <tt>y_offset</tt> 
   * <tt>x_center</tt> (Float)
@@ -58,7 +58,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
   * <tt>border</tt> (Array of 4 Integer fields) Border validity: XL, XR, YT, YB:
   * <tt>aspect_ratio</tt> (Array of 2  fields) Aspect (H:V):
   * <tt>reserve</tt> (String)
-* <tt>film</tt> (Depix::FilmInfo) Film industry info:
+* <tt>film</tt> (Depix::FilmInfo) Film industry info - required:
   * <tt>id</tt> (String) Film mfg. ID code (2 digits from film edge code)
   * <tt>type</tt> (String) Film type (2 digits from film edge code)
   * <tt>offset</tt> (String) Offset in perfs (2 digits from film edge code)
@@ -73,7 +73,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
   * <tt>frame_id</tt> (String) Frame identification (keyframe)
   * <tt>slate</tt> (String) Slate information
   * <tt>reserve</tt> (String)
-* <tt>television</tt> (Depix::TelevisionInfo) TV industry info:
+* <tt>television</tt> (Depix::TelevisionInfo) TV industry info - required:
   * <tt>time_code</tt> Timecode, formatted as HH:MM:SS:FF in the 4 higher bits of each 8bit group
   * <tt>user_bits</tt> Timecode UBITs
   * <tt>interlace</tt> (Integer) Interlace (0 = noninterlaced; 1 = 2:1 interlace
@@ -91,7 +91,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
   * <tt>white_level</tt> (Float) White level
   * <tt>integration_times</tt> (Float) Integration times (S)
   * <tt>reserve</tt> (Float)
-* <tt>user</tt> (Depix::UserInfo) User info:
+* <tt>user</tt> (Depix::UserInfo) User info - required:
   * <tt>id</tt> (String) Name of the user data tag
   * <tt>user_data_ptr</tt> 
 
