@@ -20,24 +20,29 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal "2008:12:19:01:18:37:CEST", parsed.file.timestamp
     assert_equal "UTODESK", parsed.file.creator
     assert_equal 0, parsed.image.orientation
-    assert_equal 1, parsed.image.number_elements
+    
     assert_equal 320, parsed.image.pixels_per_line
     assert_equal 240, parsed.image.lines_per_element
-    assert_equal 0, parsed.image.image_elements[0].data_sign
-    assert_equal 0, parsed.image.image_elements[0].low_data
-    assert_equal 0.0, parsed.image.image_elements[0].low_quantity
-    assert_equal 1023, parsed.image.image_elements[0].high_data
-    assert_in_delta 2.04699993133545, parsed.image.image_elements[0].high_quantity, 1.0 ** -10
+
+    assert_equal 1, parsed.image.number_elements
+    assert_equal 1, parsed.image.image_elements.length
+    ie = parsed.image.image_elements[0]
     
-    assert_equal 50, parsed.image.image_elements[0].descriptor # RGB :-)
-    assert_equal 2, parsed.image.image_elements[0].transfer
-    assert_equal 2, parsed.image.image_elements[0].colorimetric
-    assert_equal 10, parsed.image.image_elements[0].bit_size
-    assert_equal 1, parsed.image.image_elements[0].packing
-    assert_equal 0, parsed.image.image_elements[0].encoding
-    assert_equal 8192, parsed.image.image_elements[0].data_offset
-    assert_equal 0, parsed.image.image_elements[0].end_of_line_padding
-    assert_equal 0, parsed.image.image_elements[0].end_of_image_padding
+    assert_equal 0, ie.data_sign
+    assert_equal 0, ie.low_data
+    assert_equal 0.0, ie.low_quantity
+    assert_equal 1023, ie.high_data
+    assert_in_delta 2.04699993133545, ie.high_quantity, 1.0 ** -10
+    
+    assert_equal 50,    ie.descriptor # RGB :-)
+    assert_equal 2,     ie.transfer
+    assert_equal 2,     ie.colorimetric
+    assert_equal 10,    ie.bit_size
+    assert_equal 1,     ie.packing
+    assert_equal 0,     ie.encoding
+    assert_equal 8192,  ie.data_offset
+    assert_equal 0,     ie.end_of_line_padding
+    assert_equal 0,     ie.end_of_image_padding
     assert_equal "IMAGE DESCRIPTION DATA        \000P", parsed.image.image_elements[0].description
     assert_equal "E012\000\000\000\000x\340\264\020\000\000\000\000\005", 
       parsed.orientation.device #- this is where Flame writes the reel
@@ -122,7 +127,7 @@ class EditorTest < Test::Unit::TestCase
     begin
       FileUtils.cp(SAMPLE_DPX, temp_path)
       e  = Depix::Editor.new(temp_path)
-      e.headers.orientation.device = "E013"
+      e.headers.flame_reel = "E013"
 
       assert_nothing_raised { e.commit! }
 

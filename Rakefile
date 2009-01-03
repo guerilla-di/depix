@@ -2,11 +2,7 @@ require 'rubygems'
 require 'hoe'
 require './lib/depix'
 
-Class.new(Hoe) do
-  def extra_deps
-    super.reject {|e| e[0] == 'hoe' }
-  end
-end.new('depix', Depix::VERSION) do |p|
+Hoe.new('depix', Depix::VERSION) do |p|
   p.developer('Julik Tarkhanov', 'me@julik.nl')
   p.rubyforge_name = 'wiretap'
   p.extra_deps << 'timecode'

@@ -17,6 +17,7 @@ module Depix
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
     
+    # Get formatted keycode as string, empty elements are omitted
     def keycode
       [film.id, film.type, film.offset, film.prefix, film.count].compact.join(' ')
     end
@@ -32,6 +33,7 @@ module Depix
       orientation.device = new_reel
     end
     
+    # Get television.time_code as a Timecode object with a framerate
     def time_code
       Timecode.from_uint(television.time_code) #, film.frame_rate)
     end
@@ -51,7 +53,7 @@ module Depix
       COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
     end
     
-    # Aspect in it's traditional repr
+    # Aspect in it's traditional representation (1.77 for 16x9 and so on)
     def aspect
       "%.2f" % (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
     end
