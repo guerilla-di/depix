@@ -4,7 +4,7 @@ require './lib/depix'
 
 Hoe.new('depix', Depix::VERSION) do |p|
   p.developer('Julik Tarkhanov', 'me@julik.nl')
-  p.rubyforge_name = 'wiretap'
+  p.rubyforge_name = 'guerilla-di'
   p.extra_deps << 'timecode'
   p.remote_rdoc_dir = 'depix'
 end

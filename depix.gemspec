@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{depix}
-  s.version = "1.0.3"
+  s.version = "1.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
@@ -12,10 +12,10 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt", "DPX_HEADER_STRUCTURE.txt"]
   s.files = ["History.txt", "Manifest.txt", "README.txt", "DPX_HEADER_STRUCTURE.txt", "Rakefile", "bin/depix-describe", "lib/depix.rb", "lib/depix/struct_explainer.rb", "lib/depix/structs.rb", "lib/depix/benchmark.rb", "lib/depix/compact_structs.rb", "lib/depix/enums.rb", "lib/depix/dict.rb", "lib/depix/reader.rb", "lib/depix/editor.rb", "test/test_dict.rb", "test/test_depix.rb", "test/samples/E012_P001_L000002_lin.0001.dpx", "test/samples/E012_P001_L000002_lin.0002.dpx", "test/samples/E012_P001_L000002_log.0001.dpx", "test/samples/E012_P001_L000002_log.0002.dpx"]
   s.has_rdoc = true
-  s.homepage = %q{http://wiretap.rubyforge.org/depix}
+  s.homepage = %q{http://guerilla-di.rubyforge.org/depix}
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{wiretap}
+  s.rubyforge_project = %q{guerilla-di}
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{Read DPX file metadata}
   s.test_files = ["test/test_depix.rb", "test/test_dict.rb"]
