@@ -17,7 +17,7 @@ module Depix
     char :filename, 100,  :desc => 'Original filename'
     char :timestamp, 24,  :desc => 'Creation timestamp'
     char :creator, 100,   :desc => 'Creator application'
-    char :roject, 200,    :desc => 'Project name'
+    char :project, 200,    :desc => 'Project name'
     char :copyright, 200, :desc => 'Copyright'
     
     u32  :encrypt_key,    :desc => 'Encryption key'

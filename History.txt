@@ -1,3 +1,5 @@
+* Fix project field name
+
 === 1.0.5 / 2009-01-18
 
 * Switch project to guerilla-di

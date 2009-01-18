@@ -18,7 +18,7 @@ DPX metadata gets returned as a Depix::DPX object with nested properties.
   * <tt>filename</tt> (String) Original filename
   * <tt>timestamp</tt> (String) Creation timestamp
   * <tt>creator</tt> (String) Creator application
-  * <tt>roject</tt> (String) Project name
+  * <tt>project</tt> (String) Project name
   * <tt>copyright</tt> (String) Copyright
   * <tt>encrypt_key</tt> Encryption key
   * <tt>reserve</tt> (String)
