@@ -119,7 +119,8 @@ class EditorTest < Test::Unit::TestCase
     e = Depix::Editor.new(SAMPLE_DPX)
     assert_not_nil e
     assert_equal SAMPLE_DPX, e.path
-    assert_not_nil e.headers
+    assert_respond_to e, :flame_reel
+    assert_equal "E012", e.flame_reel
   end
   
   def test_commit
@@ -127,7 +128,7 @@ class EditorTest < Test::Unit::TestCase
     begin
       FileUtils.cp(SAMPLE_DPX, temp_path)
       e  = Depix::Editor.new(temp_path)
-      e.headers.flame_reel = "E013"
+      e.flame_reel = "E013"
 
       assert_nothing_raised { e.commit! }
 
