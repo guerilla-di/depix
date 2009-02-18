@@ -1,3 +1,4 @@
+* Allow access to headers directly in Depix::Editor
 * Fix project field name
 
 === 1.0.5 / 2009-01-18
