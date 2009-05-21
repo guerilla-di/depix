@@ -1,4 +1,4 @@
-=== 1.0.6 / 2009-05-21
+=== 1.0.7 / 2009-05-21
 
 * Do not bail out on headers newer than V1.0
 * Allow access to headers directly in Depix::Editor
