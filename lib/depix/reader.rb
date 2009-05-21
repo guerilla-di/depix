@@ -26,14 +26,14 @@ module Depix
     # The hear of Depix
     def parse(data, compact)
       magic = data[0..3]
-    
+      
       raise InvalidHeader, "No magic bytes found at start" unless %w( SDPX XPDS).include?(magic)
-    
+      
       struct = compact ? CompactDPX : DPX
-    
+      
       is_be = (magic == "SDPX")
       version_check = FileInfo.only(:magic, :version)
-    
+      
       result = begin
         if is_be
           version_check.consume!(data.unpack(version_check.pattern))
@@ -43,8 +43,6 @@ module Depix
       rescue ArgumentError
         raise InvalidHeader
       end
-    
-      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version == "V1.0"
      
       template = is_be ? DPX.pattern : make_le(DPX.pattern)
       struct.consume!(data.unpack(struct.pattern))
