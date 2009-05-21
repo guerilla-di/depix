@@ -2,7 +2,19 @@ require 'delegate'
 
 module Depix
   # Used to edit DPX headers. Create an Editor object and pass the path to the file to it. Change the headers variable to contain the edited
-  # DPX headers and call commit!. Note that the DPX header will be overwritten in place - if you want to save another version you need to manage it yourself
+  # DPX headers and call commit!. Note that the DPX header will be overwritten in place - if you want to save another version you need to manage
+  # it yourself.
+  #
+  #      dpx = Depix::Editor.new("/RAID/scans/1374470_adjusted.dpx")
+  #      dpx.file.copyright = "Copyleft"
+  #      dpx.file.reserve = "FileReserve"
+  #      dpx.orientation.reserve = "OrientReserve"
+  #      dpx.orientation.device = "Chainik"
+  #      dpx.orientation.serial = "43"
+  #      dpx.film.reserve = "FilmRezerve"
+  #      dpx.file.project = "Mastermind"
+  #      
+  #      dpx.commit! # will write out the headers
   class Editor < Delegator
 
     # Stores the path to file
