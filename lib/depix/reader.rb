@@ -43,7 +43,9 @@ module Depix
       rescue ArgumentError
         raise InvalidHeader
       end
-     
+      
+      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version =~ /V(\d)\.(\d+)/
+      
       template = is_be ? DPX.pattern : make_le(DPX.pattern)
       struct.consume!(data.unpack(struct.pattern))
     end
