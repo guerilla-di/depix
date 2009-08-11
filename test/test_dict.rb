@@ -147,7 +147,7 @@ end
 class TestArrayField < Test::Unit::TestCase
   include FieldConformity
   
-  def test_array_field_conform_field!s_to_field_and_has_extra_methods
+  def test_array_field_conforms_to_field_and_has_extra_methods
     f = ArrayField.new
     conform_field!(f)
     
