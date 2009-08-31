@@ -1,6 +1,6 @@
 = depix
 
-* http://guerilla-di.rubyforge.org/depix
+* http://guerilla-di.org/depix
 
 == DESCRIPTION:
 
