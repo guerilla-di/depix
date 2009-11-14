@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.0.7'
+  VERSION = '1.0.8'
   
   class InvalidHeader < RuntimeError; end
   

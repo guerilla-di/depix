@@ -1,8 +1,34 @@
 module Depix
   
   #:stopdoc:
+  
+=begin
+  A basic C structs library (only works by value).
+  Here's the basic mode of operation:
+   1) You define a struct, with a number of fields in it
+   3) Each field knows how big it is and how to produce a pattern to get it's value from the byte stream
+      by using Ruby's "pack/unpack". Each field thus provides an unpack pattern, and patterns are ordered
+      into a stack, starting with the first unpack pattern
+   4) When you parse some bytes using the struct, heres what will happen:
+      - An unpack pattern will be compiled from all of the fields composing the struct,
+       and it will be a single string. The string gets applied to the bytes passed to parse()
+      - An array of unpacked values returned by unpack is then passed to the struct's consumption engine,
+        which lets each field take as many items off the stack as it needs. A field might happily produce
+        4 items for unpacking and then take the same 4 items off the stack of parsed values. Or not.
+      - A new structure gets created and for every named field it defines an attr_accessor. When consuming,
+        the values returned by Field objects get set using the accessors (so accessors can be overridden too!)
+   5) When you save out the struct roughly the same happens but in reverse (readers are called per field,
+      then it's checked whether the data can be packed and fits into the alloted number of bytes, and then
+      one big array of values is composed and passed on to Array#pack)
+=end
+
   class Field
-    attr_accessor :name, :length, :pattern, :req, :desc, :rtype
+    attr_accessor :name, # Field name
+                  :length, # Field length in bytes, including any possible padding
+                  :pattern, # The unpack pattern that defines the field
+                  :req, # Is the field required?
+                  :desc, # Field description
+                  :rtype  # To which Ruby type this has to be cast (and which type is accepted as value)
     alias_method :req?, :req
     
     # Hash init
@@ -36,17 +62,19 @@ module Depix
       R32Field.new(o)
     end
     
-    # Return a cleaned value
+    # Return a cleaned value (like a null-terminated string truncated up to null)
     def clean(v)
       v
     end
     
+    # Show a nice textual explanation of the field
     def explain
       [rtype ? ("(%s)" % rtype) : nil, desc, (req? ? "- required" : nil)].compact.join(' ')
     end
     
     # Return the actual values from the stack. The stack will begin on the element we need,
-    # so the default consumption is shift
+    # so the default consumption is shift. Normally all fields shift the stack
+    # as they go, and if they contain nested substructs they will pop the stack as well
     def consume!(stack)
       clean(stack.shift)
     end
@@ -193,7 +221,7 @@ module Depix
     
     BLANKING_VALUES = [0x00.chr, 0xFF.chr]
     BLANKING_PATTERNS = BLANKING_VALUES.inject([]) do | p, char |
-      p << /^(#{char}+)/ << /(#{char}+)$/
+      p << /^([#{char}]+)/ << /([#{char}]+)$/mu
     end
     
     def pattern

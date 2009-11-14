@@ -1,3 +1,5 @@
+=== 1.0.8 / 2009-11-14
+
 * Fix the version tag check so that it allows all versions but is still included, and so that the tests run
 
 === 1.0.7 / 2009-05-21

@@ -1,10 +1,10 @@
+.DS_Store
 DPX_HEADER_STRUCTURE.txt
 History.txt
 Manifest.txt
 README.txt
 Rakefile
 bin/depix-describe
-depix.gemspec
 lib/depix.rb
 lib/depix/benchmark.rb
 lib/depix/compact_structs.rb
@@ -14,6 +14,9 @@ lib/depix/enums.rb
 lib/depix/reader.rb
 lib/depix/struct_explainer.rb
 lib/depix/structs.rb
+test/.DS_Store
+test/samples/.DS_Store
+test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx
 test/samples/E012_P001_L000002_lin.0001.dpx
 test/samples/E012_P001_L000002_lin.0002.dpx
 test/samples/E012_P001_L000002_log.0001.dpx
