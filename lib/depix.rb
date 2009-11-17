@@ -10,12 +10,14 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.0.9'
+  VERSION = '1.1.0'
   
   class InvalidHeader < RuntimeError; end
   
   # Offers convenience access to a few common attributes bypassing the piecemeal structs
   module Synthetics
+    
+    DEFAULT_DPX_FPS = 25
     
     # Get formatted keycode as string, empty elements are omitted
     def keycode
@@ -33,14 +35,17 @@ module Depix
       orientation.device = new_reel
     end
     
-    # Get television.time_code as a Timecode object with a framerate
+    # Get television.time_code as a Timecode object with a framerate.
+    # We explicitly use the television frame rate since Northlight
+    # writes different rates for television and film time code
     def time_code
-      Timecode.from_uint(television.time_code, film.frame_rate.to_i)
+      framerate = television.frame_rate || film.frame_rate || DEFAULT_DPX_FPS
+      Timecode.from_uint(television.time_code, framerate)
     end
     
     # Assign frame rate and timecode from a Timecode object
     def time_code=(new_tc)
-      television.time_code, film.frame_rate = new_tc.to_uint, new_tc.fps
+      television.time_code, television.frame_rate = new_tc.to_uint, new_tc.fps
     end
     
     # Get the name of the transfer function (Linear, Logarithmic, ...)

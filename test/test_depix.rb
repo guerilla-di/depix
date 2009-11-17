@@ -112,6 +112,12 @@ class ReaderTest < Test::Unit::TestCase
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
 
   end
+  
+  def test_parse_with_timecode_mismatch
+    # This file has mismatching framerates in the film and television headers 
+    dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/northlight_tc_mode_mismatch.dpx")
+    assert_equal "22:02:18:24", dpx.time_code.to_s
+  end
 end
 
 class EditorTest < Test::Unit::TestCase
