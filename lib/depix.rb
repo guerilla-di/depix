@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.0.8'
+  VERSION = '1.0.9'
   
   class InvalidHeader < RuntimeError; end
   
@@ -35,7 +35,7 @@ module Depix
     
     # Get television.time_code as a Timecode object with a framerate
     def time_code
-      Timecode.from_uint(television.time_code) #, film.frame_rate)
+      Timecode.from_uint(television.time_code, film.frame_rate.to_i)
     end
     
     # Assign frame rate and timecode from a Timecode object

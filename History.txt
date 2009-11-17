@@ -1,3 +1,7 @@
+=== 1.0.9 / 2009-11-16
+
+* Accomodate the frames per second value from the file for synthetics time code
+
 === 1.0.8 / 2009-11-14
 
 * Fix the version tag check so that it allows all versions but is still included, and so that the tests run
