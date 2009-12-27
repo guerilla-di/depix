@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.1.0'
+  VERSION = '1.1.1'
   
   class InvalidHeader < RuntimeError; end
   
@@ -24,9 +24,11 @@ module Depix
       [film.id, film.type, film.offset, film.prefix, film.count].compact.join(' ')
     end
     
-    # Return the flame reel name. The data after the first null byte is not meant to be seen and is used by Flame internally
+    # Return the flame reel name. The data after the first null byte is not meant to be seen 
+    # and is used by Flame internally
     # as it seems
     def flame_reel
+      return nil unless orientation.device
       orientation.device.split(0x00.chr).shift
     end
     

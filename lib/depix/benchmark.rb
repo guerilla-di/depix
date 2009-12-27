@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../depix'
 
 require 'benchmark'
 
-iter = 10000
+iter = 1000
 
 puts "Reading DPX header #{iter} times, all data"
 puts Benchmark.measure {
