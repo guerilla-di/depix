@@ -1,3 +1,7 @@
+=== 1.1.2 / 2009-12-27
+
+* Do not try to work with timecode data if it's nil
+
 === 1.1.1 / 2009-12-27
 
 * Return nil for flame_reel if the header was empty

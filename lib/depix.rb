@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.1.1'
+  VERSION = '1.1.2'
   
   class InvalidHeader < RuntimeError; end
   
@@ -42,7 +42,11 @@ module Depix
     # writes different rates for television and film time code
     def time_code
       framerate = television.frame_rate || film.frame_rate || DEFAULT_DPX_FPS
-      Timecode.from_uint(television.time_code, framerate)
+      if television.time_code
+        Timecode.from_uint(television.time_code, framerate)
+      else
+        Timecode.new(0, framerate)
+      end
     end
     
     # Assign frame rate and timecode from a Timecode object

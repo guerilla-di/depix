@@ -232,8 +232,9 @@ module Depix
       if v == BLANK
         nil
       else
-        2.times { BLANKING_PATTERNS.each{|p| v.gsub!(p, '')} }
-        v.empty? ? nil : v
+        # Truncate everything from the null byte up
+        upto_nulb = v.split(0x00.chr).shift
+        (upto_nulb.nil? || upto_nulb.empty?) ? nil : upto_nulb
       end
     end
     
@@ -503,6 +504,14 @@ module Depix
         options, count = (args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS), (args.shift || 1)
         [count, options]
       end
+    end # End class methods
+    
+    def []=(field, value)
+      send("#{field}=", value)
+    end
+    
+    def [](field)
+      send(field)
     end
   end
   

@@ -18,7 +18,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 6144, parsed.file.user_size
     assert_equal "E012_P001_L000002_lin.0001.dpx", parsed.file.filename
     assert_equal "2008:12:19:01:18:37:CEST", parsed.file.timestamp
-    assert_equal "UTODESK", parsed.file.creator
+    assert_equal nil, parsed.file.creator
     assert_equal 0, parsed.image.orientation
     
     assert_equal 320, parsed.image.pixels_per_line
@@ -43,8 +43,8 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 8192,  ie.data_offset
     assert_equal 0,     ie.end_of_line_padding
     assert_equal 0,     ie.end_of_image_padding
-    assert_equal "IMAGE DESCRIPTION DATA        \000P", ie.description
-    assert_equal "E012\000\000\000\000x\340\264\020\000\000\000\000\005", 
+    assert_equal "IMAGE DESCRIPTION DATA        ", ie.description
+    assert_equal "E012", 
       parsed.orientation.device #- this is where Flame writes the reel
     
     assert_equal 853, parsed.orientation.aspect_ratio[0]
@@ -127,6 +127,14 @@ class EditorTest < Test::Unit::TestCase
     assert_equal SAMPLE_DPX, e.path
     assert_respond_to e, :flame_reel
     assert_equal "E012", e.flame_reel
+  end
+  
+  def test_copy_from
+    e = Depix::Editor.new(SAMPLE_DPX)
+    assert_equal SAMPLE_DPX, e.path
+    another = Depix.from_file(File.dirname(__FILE__) + "/samples/northlight_tc_mode_mismatch.dpx")
+    e.copy_from(another)
+    assert_equal "Northlight", e.orientation.device
   end
   
   def test_commit

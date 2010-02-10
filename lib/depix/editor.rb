@@ -26,14 +26,16 @@ module Depix
       @dpx = Depix.from_file(@path)
     end
     
+    # Copy headers from another DPX object
+    def copy_from(another)
+      @dpx = another
+    end
+    
     # Save the headers to file at path, overwriting the old ones
     def commit!
       raise "No headers" unless @dpx
       raise "Cannot pack LE headers yet" if @dpx.le?
       packed = @dpx.class.pack(@dpx)
-      
-      # Validate that we can unpack first - what if something went wrong?
-      Depix::Reader.new.parse(packed, false)
       
       # Use in-place writing into DPX file (this is what + does)
       File.open(@path, 'rb+') do | f |
