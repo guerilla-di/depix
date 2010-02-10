@@ -1,4 +1,4 @@
-=== 1.1.3 / 2009-12-27
+=== 1.1.3 / 2010-02-12
 
 * Discard charfield content that comes after the first null byte (seriously, who cares?)
 * Add Editor#copy_from(another_dpx)
