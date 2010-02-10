@@ -2,10 +2,11 @@ require 'rubygems'
 require 'hoe'
 require './lib/depix'
 
-Hoe.new('depix', Depix::VERSION) do |p|
+Hoe.spec('depix') do |p|
+  p.version = Depix::VERSION
   p.developer('Julik Tarkhanov', 'me@julik.nl')
   p.rubyforge_name = 'guerilla-di'
-  p.extra_deps << 'timecode'
+  p.extra_deps << ['timecode', ">=", "0.2.0"]
   p.remote_rdoc_dir = 'depix'
 end
 
