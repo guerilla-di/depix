@@ -8,6 +8,7 @@ Hoe.spec('depix') do |p|
   p.rubyforge_name = 'guerilla-di'
   p.extra_deps << ['timecode', ">=", "0.2.0"]
   p.remote_rdoc_dir = 'depix'
+  p.clean_globs = %w( **/.DS_Store )
 end
 
 task :describe_structs do
