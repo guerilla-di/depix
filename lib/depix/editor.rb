@@ -27,8 +27,12 @@ module Depix
     end
     
     # Copy headers from another DPX object
-    def copy_from(another)
-      @dpx = another
+    def copy_from(another, *fields_to_copy)
+      if fields_to_copy.empty?
+        @dpx = another.dup
+      else
+        fields_to_copy.each{|f| @dpx[f] = another[f] }
+      end
     end
     
     # Save the headers to file at path, overwriting the old ones

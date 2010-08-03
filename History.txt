@@ -1,3 +1,8 @@
+=== 1.1.4 / 2010-08-04
+
+* Properly fallback to film framerate in timecode detection if television framerate is 
+  recognized as being zero (is a fact for Nuke renders)
+
 === 1.1.3 / 2010-02-12
 
 * Discard charfield content that comes after the first null byte (seriously, who cares?)

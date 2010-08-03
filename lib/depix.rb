@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/depix/editor'
 
 
 module Depix
-  VERSION = '1.1.3'
+  VERSION = '1.1.4'
   
   class InvalidHeader < RuntimeError; end
   
@@ -41,11 +41,13 @@ module Depix
     # We explicitly use the television frame rate since Northlight
     # writes different rates for television and film time code
     def time_code
-      framerate = television.frame_rate || film.frame_rate || DEFAULT_DPX_FPS
+      framerates = [television.frame_rate, film.frame_rate, DEFAULT_DPX_FPS]
+      framerate = framerates.find{|e| !e.nil? && !e.zero? }
       if television.time_code
         Timecode.from_uint(television.time_code, framerate)
       else
-        Timecode.new(0, framerate)
+        # Assume frame position
+        Timecode.new(film.frame_position, framerate)
       end
     end
     

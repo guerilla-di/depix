@@ -118,6 +118,14 @@ class ReaderTest < Test::Unit::TestCase
     dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/northlight_tc_mode_mismatch.dpx")
     assert_equal "22:02:18:24", dpx.time_code.to_s
   end
+
+  def test_parse_zero_tc_fps
+    # This file has mismatching framerates in the film and television headers 
+    dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/from_nuke_no_TC_meta.dpx")
+    assert_equal "05:00:59:20", dpx.time_code.to_s
+    assert_equal 25, dpx.time_code.fps
+  end
+
 end
 
 class EditorTest < Test::Unit::TestCase
