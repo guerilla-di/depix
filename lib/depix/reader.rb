@@ -44,7 +44,7 @@ module Depix
         raise InvalidHeader
       end
       
-      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version =~ /V(\d)\.(\d+)/
+      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version =~ /V(\d)\.(\d+)/i
       
       template = is_be ? DPX.pattern : make_le(DPX.pattern)
       struct.consume!(data.unpack(struct.pattern))

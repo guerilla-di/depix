@@ -113,6 +113,12 @@ class ReaderTest < Test::Unit::TestCase
 
   end
   
+  def test_parsing_gluetools_file
+    # This file comes from GlueTools
+    dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/gluetools_file_header.dpx")
+    assert_equal "03:09:00:17", dpx.time_code.to_s
+  end
+  
   def test_parse_with_timecode_mismatch
     # This file has mismatching framerates in the film and television headers 
     dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/northlight_tc_mode_mismatch.dpx")
