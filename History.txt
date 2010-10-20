@@ -1,3 +1,7 @@
+=== 1.1.5 / 2010-10-20
+
+* Properly detect the DPX version when it is entered lowercase
+
 === 1.1.4 / 2010-08-04
 
 * Properly fallback to film framerate in timecode detection if television framerate is 
