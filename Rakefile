@@ -6,7 +6,7 @@ Hoe.spec('depix') do |p|
   p.version = Depix::VERSION
   p.developer('Julik Tarkhanov', 'me@julik.nl')
   p.rubyforge_name = 'guerilla-di'
-  p.extra_deps << ['timecode', ">=", "0.2.0"]
+  p.extra_deps << ['timecode']
   p.remote_rdoc_dir = 'depix'
   p.clean_globs = %w( **/.DS_Store )
 end

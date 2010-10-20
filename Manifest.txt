@@ -20,5 +20,6 @@ test/samples/E012_P001_L000002_log.0001.dpx
 test/samples/E012_P001_L000002_log.0002.dpx
 test/samples/from_nuke_no_TC_meta.dpx
 test/samples/northlight_tc_mode_mismatch.dpx
+test/samples/gluetools_file_header.dpx
 test/test_depix.rb
 test/test_dict.rb

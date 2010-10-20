@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/../lib/depix'
 require 'test/unit'
+require "fileutils"
 
 SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
 
@@ -153,8 +154,8 @@ class EditorTest < Test::Unit::TestCase
   
   def test_commit
     temp_path = SAMPLE_DPX + ".test"
+    FileUtils.cp(SAMPLE_DPX, temp_path)
     begin
-      FileUtils.cp(SAMPLE_DPX, temp_path)
       e  = Depix::Editor.new(temp_path)
       e.flame_reel = "E013"
 
