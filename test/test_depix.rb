@@ -108,10 +108,9 @@ class ReaderTest < Test::Unit::TestCase
     
     s = "Mary had a little lamb" * 1000
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
-
+    
     s = "SDPX Mary had a little lamb" * 1000
     assert_raise(Depix::InvalidHeader) { Depix.from_string(s) }
-
   end
   
   def test_parsing_gluetools_file
@@ -132,7 +131,13 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal "05:00:59:20", dpx.time_code.to_s
     assert_equal 25, dpx.time_code.fps
   end
-
+  
+  def test_parse_le_dpx
+    # This file is little-endian 
+    dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/little_endian.dpx")
+    assert_in_delta 25, dpx.film.frame_rate, 0.01
+  end
+  
 end
 
 class EditorTest < Test::Unit::TestCase

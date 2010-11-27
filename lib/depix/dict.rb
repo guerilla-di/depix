@@ -414,6 +414,12 @@ module Depix
         fields.map{|f| f.pattern }.join
       end
       
+      # Get the pattern that will be used to unpack this structure and all of it's descendants
+      # from a buffer with pieces in little-endian byte order
+      def pattern_le
+        pattern.tr("gN", "eV")
+      end
+      
       # How many bytes are needed to complete this structure
       def length
         fields.inject(0){|_, s| _ + s.length }
@@ -431,6 +437,12 @@ module Depix
       # Apply this structure to data in the string, returning an instance of this structure with fields completed
       def apply!(string)
         consume!(string.unpack(pattern))
+      end
+      
+      # Apply this structure to data in the string, returning an instance of this structure with fields completed
+      # assume little-endian fields
+      def apply_le!(string)
+        consume!(string.unpack(pattern_le))
       end
       
       # Get a class that would parse just the same, preserving only the fields passed in the array. This speeds

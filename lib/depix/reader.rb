@@ -26,28 +26,20 @@ module Depix
     # The hear of Depix
     def parse(data, compact)
       magic = data[0..3]
-      
       raise InvalidHeader, "No magic bytes found at start" unless %w( SDPX XPDS).include?(magic)
       
-      struct = compact ? CompactDPX : DPX
+      is_le = (magic == "XPDS")
       
-      is_be = (magic == "SDPX")
       version_check = FileInfo.only(:magic, :version)
-      
-      result = begin
-        if is_be
-          version_check.consume!(data.unpack(version_check.pattern))
-        else
-          version_check.consume!(data.unpack(make_le(version_check.pattern)))
-        end
+      begin
+        result = is_le ? version_check.apply_le!(data) : version_check.apply!(data)
+        raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version =~ /V(\d)\.(\d+)/i
       rescue ArgumentError
-        raise InvalidHeader
+        raise InvalidHeader, "Cannot unpack header"
       end
       
-      raise InvalidHeader, "Unknown version tag #{result.version}" unless result.version =~ /V(\d)\.(\d+)/i
-      
-      template = is_be ? DPX.pattern : make_le(DPX.pattern)
-      struct.consume!(data.unpack(struct.pattern))
+      struct = compact ? CompactDPX : DPX
+      is_le ? struct.apply_le!(data) : struct.apply!(data)
     end
   
     # Describe a filled DPX structure
@@ -72,11 +64,6 @@ module Depix
         end
         info
       end.map{|e| ('  ' * pad_offset) + e }.join("\n")
-    end
-  
-    # Convert an unpack pattern to LE
-    def make_le(pattern)
-      pattern.gsub(/n/, "v").gsub(/N/, "V").gsub(/g/, "f")
     end
   
   end
