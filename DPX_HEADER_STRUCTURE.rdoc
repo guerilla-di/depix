@@ -1,0 +1,97 @@
+= DPX header structure description
+
+DPX metadata gets returned as a Depix::DPX object with nested properties.
+  
+  meta.file.magic # => "SDPX"
+
+== Metadata structure
+
+* <tt>file</tt> (Depix::FileInfo) File information - required:
+  * <tt>magic</tt> (String) Endianness (SDPX is big endian) - required
+  * <tt>image_offset</tt> Offset to image data in bytes - required
+  * <tt>version</tt> (String) Version of header format - required
+  * <tt>file_size</tt> Total image size in bytes - required
+  * <tt>ditto_key</tt> Whether the basic headers stay the same through the sequence (1 means they do)
+  * <tt>generic_size</tt> Generic header length
+  * <tt>industry_size</tt> Industry header length
+  * <tt>user_size</tt> User header length
+  * <tt>filename</tt> (String) Original filename
+  * <tt>timestamp</tt> (String) Creation timestamp
+  * <tt>creator</tt> (String) Creator application
+  * <tt>project</tt> (String) Project name
+  * <tt>copyright</tt> (String) Copyright
+  * <tt>encrypt_key</tt> Encryption key
+  * <tt>reserve</tt> (String)
+* <tt>image</tt> (Depix::ImageInfo) Image information - required:
+  * <tt>orientation</tt> (Integer) Orientation descriptor - required
+  * <tt>number_elements</tt> (Integer) How many elements to scan - required
+  * <tt>pixels_per_line</tt> Pixels per horizontal line - required
+  * <tt>lines_per_element</tt> Line count - required
+  * <tt>image_elements</tt> (Array of 8 Depix::ImageElement fields) Image elements:
+    * <tt>data_sign</tt> Data sign (0=unsigned, 1=signed). Core is unsigned - required
+    * <tt>low_data</tt> Reference low data code value
+    * <tt>low_quantity</tt> (Float) Reference low quantity represented
+    * <tt>high_data</tt> Reference high data code value (1023 for 10bit per channel)
+    * <tt>high_quantity</tt> (Float) Reference high quantity represented
+    * <tt>descriptor</tt> (Integer) Descriptor for this image element (ie Video or Film), by enum - required
+    * <tt>transfer</tt> (Integer) Transfer function (ie Linear), by enum - required
+    * <tt>colorimetric</tt> (Integer) Colorimetric (ie YcbCr), by enum - required
+    * <tt>bit_size</tt> (Integer) Bit size for element (ie 10) - required
+    * <tt>packing</tt> (Integer) Packing (0=Packed into 32-bit words, 1=Filled to 32-bit words)) - required
+    * <tt>encoding</tt> (Integer) Encoding (0=None, 1=RLE) - required
+    * <tt>data_offset</tt> Offset to data for this image element - required
+    * <tt>end_of_line_padding</tt> End-of-line padding for this image element
+    * <tt>end_of_image_padding</tt> End-of-line padding for this image element
+    * <tt>description</tt> (String)
+  * <tt>reserve</tt> (String)
+* <tt>orientation</tt> (Depix::OrientationInfo) Orientation - required:
+  * <tt>x_offset</tt> 
+  * <tt>y_offset</tt> 
+  * <tt>x_center</tt> (Float)
+  * <tt>y_center</tt> (Float)
+  * <tt>x_size</tt> Original X size
+  * <tt>y_size</tt> Original Y size
+  * <tt>filename</tt> (String) Source image filename
+  * <tt>timestamp</tt> (String) Source image/tape timestamp
+  * <tt>device</tt> (String) Input device or tape
+  * <tt>serial</tt> (String) Input device serial number
+  * <tt>border</tt> (Array of 4 Integer fields) Border validity: XL, XR, YT, YB:
+  * <tt>aspect_ratio</tt> (Array of 2  fields) Aspect (H:V):
+  * <tt>reserve</tt> (String)
+* <tt>film</tt> (Depix::FilmInfo) Film industry info - required:
+  * <tt>id</tt> (String) Film mfg. ID code (2 digits from film edge code)
+  * <tt>type</tt> (String) Film type (2 digits from film edge code)
+  * <tt>offset</tt> (String) Offset in perfs (2 digits from film edge code)
+  * <tt>prefix</tt> (String) Prefix (6 digits from film edge code
+  * <tt>count</tt> (String) Count (4 digits from film edge code)
+  * <tt>format</tt> (String) Format (e.g. Academy)
+  * <tt>frame_position</tt> Frame position in sequence
+  * <tt>sequence_extent</tt> Sequence length
+  * <tt>held_count</tt> For how many frames the frame is held
+  * <tt>frame_rate</tt> (Float) Frame rate
+  * <tt>shutter_angle</tt> (Float) Shutter angle
+  * <tt>frame_id</tt> (String) Frame identification (keyframe)
+  * <tt>slate</tt> (String) Slate information
+  * <tt>reserve</tt> (String)
+* <tt>television</tt> (Depix::TelevisionInfo) TV industry info - required:
+  * <tt>time_code</tt> Timecode, formatted as HH:MM:SS:FF in the 4 higher bits of each 8bit group
+  * <tt>user_bits</tt> Timecode UBITs
+  * <tt>interlace</tt> (Integer) Interlace (0 = noninterlaced; 1 = 2:1 interlace
+  * <tt>field_number</tt> (Integer) Field number
+  * <tt>video_signal</tt> (Integer) Video signal (by enum)
+  * <tt>padding</tt> (Integer) Zero (for byte alignment)
+  * <tt>horizontal_sample_rate</tt> (Float) Horizontal sampling Hz
+  * <tt>vertical_sample_rate</tt> (Float) Vertical sampling Hz
+  * <tt>frame_rate</tt> (Float) Frame rate
+  * <tt>time_offset</tt> (Float) From sync pulse to first pixel
+  * <tt>gamma</tt> (Float) Gamma
+  * <tt>black_level</tt> (Float) Black pedestal code value
+  * <tt>black_gain</tt> (Float) Black gain code value
+  * <tt>break_point</tt> (Float) Break point (?)
+  * <tt>white_level</tt> (Float) White level
+  * <tt>integration_times</tt> (Float) Integration times (S)
+  * <tt>reserve</tt> (Float)
+* <tt>user</tt> (Depix::UserInfo) User info - required:
+  * <tt>id</tt> (String) Name of the user data tag
+  * <tt>user_data_ptr</tt> 
+
