@@ -1,4 +1,5 @@
 require 'test/unit'
+require File.dirname(__FILE__) + '/../lib/depix' unless defined?(Depix)
 
 include Depix::Binary
 include Depix::Binary::Fields

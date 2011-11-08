@@ -1,3 +1,4 @@
+.gemtest
 DPX_HEADER_STRUCTURE.rdoc
 History.txt
 Manifest.txt
@@ -5,6 +6,7 @@ README.rdoc
 Rakefile
 bin/depix-describe
 lib/depix.rb
+lib/depix/benchmark.rb
 lib/depix/binary/descriptor.rb
 lib/depix/binary/fields.rb
 lib/depix/binary/structure.rb
@@ -24,5 +26,6 @@ test/samples/from_nuke_no_TC_meta.dpx
 test/samples/gluetools_file_header.dpx
 test/samples/little_endian.dpx
 test/samples/northlight_tc_mode_mismatch.dpx
+test/test_binary.rb
 test/test_depix.rb
-test/test_dict.rb
+test/test_describe.rb

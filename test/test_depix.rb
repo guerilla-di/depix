@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__)) + '/../lib/depix'
 require 'test/unit'
+require File.dirname(__FILE__) + '/../lib/depix' unless defined?(Depix)
 require "fileutils"
 
 SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'

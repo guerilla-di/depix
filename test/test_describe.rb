@@ -1,4 +1,5 @@
 require 'test/unit'
+require File.dirname(__FILE__) + '/../lib/depix' unless defined?(Depix)
 require "cli_test"
 
 class TestDescribe < Test::Unit::TestCase
