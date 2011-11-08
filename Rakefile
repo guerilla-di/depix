@@ -5,13 +5,11 @@ require './lib/depix'
 Hoe.spec('depix') do |p|
   p.version = Depix::VERSION
   p.developer('Julik Tarkhanov', 'me@julik.nl')
-  p.rubyforge_name = 'guerilla-di'
-  p.extra_deps << ['timecode']
-  p.remote_rdoc_dir = 'depix'
+  p.extra_deps = {'timecode' => "~1.0"}
+  p.extra_dev_deps = {'cli_test' => "~1.0"}
   p.readme_file   = 'README.rdoc'
   p.extra_rdoc_files  = FileList['*.rdoc']
-  
-  p.clean_globs = %w( **/.DS_Store )
+  p.clean_globs = File.read(File.dirname(__FILE__) + "/.gitignore").split(/\s/).to_a
 end
 
 task :describe_structs do
