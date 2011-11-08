@@ -1,3 +1,7 @@
+=== 2.0.1 / 2011-11-09
+
+* Fix the errors in depix-describe
+
 === 2.0.0 / 2011-06-14
 
 * Depix::Binary is now public, and it's a nice library. Check it out.
