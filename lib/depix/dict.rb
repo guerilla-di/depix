@@ -98,6 +98,7 @@ module Depix
         [value].pack(pattern)
       end
     end
+    
   end
   
   class U32Field < Field
@@ -480,6 +481,9 @@ module Depix
         # Preallocate a buffer just as big as me since we want everything to remain at fixed offsets
         buffer ||= ("\000" * length)
         
+        # We need to enforce ASCII-8bit encoding which in Ruby parlance is actually "bytestream"
+        byteify_string(buffer) unless RUBY_VERSION < '1.9.0'
+        
         # If the instance is nil return pure padding
         return buffer if instance.nil?
         
@@ -516,6 +520,12 @@ module Depix
         options, count = (args[-1].is_a?(Hash) ? DEF_OPTS.merge(args.pop) : DEF_OPTS), (args.shift || 1)
         [count, options]
       end
+      
+      # Only relevant for 1.9
+      def byteify_string(string)
+        string.force_encoding("ASCII-8BIT")
+      end
+      
     end # End class methods
     
     def []=(field, value)
