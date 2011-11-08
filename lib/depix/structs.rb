@@ -1,9 +1,6 @@
-require File.dirname(__FILE__) + '/dict'
-
-
 module Depix
   
-  class FileInfo < Dict
+  class FileInfo < Binary::Structure
     char :magic, 4,       :desc => 'Endianness (SDPX is big endian)', :req => true
     u32  :image_offset,   :desc => 'Offset to image data in bytes', :req => true
     char :version, 8,     :desc => 'Version of header format', :req => true
@@ -24,7 +21,7 @@ module Depix
     char :reserve, 104
   end
   
-  class FilmInfo < Dict
+  class FilmInfo < Binary::Structure
     char :id, 2,          :desc => 'Film mfg. ID code (2 digits from film edge code)'
     char :type, 2,        :desc => 'Film type (2 digits from film edge code)'
     char :offset, 2,      :desc => 'Offset in perfs (2 digits from film edge code)'
@@ -44,7 +41,7 @@ module Depix
     char :reserve, 56
   end
   
-  class ImageElement < Dict
+  class ImageElement < Binary::Structure
     u32 :data_sign, :desc => 'Data sign (0=unsigned, 1=signed). Core is unsigned', :req => true
     
     u32 :low_data,      :desc => 'Reference low data code value'
@@ -66,7 +63,7 @@ module Depix
     char :description, 32
   end
 
-  class OrientationInfo < Dict
+  class OrientationInfo < Binary::Structure
 
     u32 :x_offset
     u32 :y_offset
@@ -88,7 +85,7 @@ module Depix
     char :reserve, 28
   end
   
-  class TelevisionInfo < Dict
+  class TelevisionInfo < Binary::Structure
     u32 :time_code, :desc => "Timecode, formatted as HH:MM:SS:FF in the 4 higher bits of each 8bit group"
     u32 :user_bits, :desc => "Timecode UBITs"
     u8 :interlace,  :desc => "Interlace (0 = noninterlaced; 1 = 2:1 interlace"
@@ -110,12 +107,12 @@ module Depix
     r32 :reserve
   end
   
-  class UserInfo < Dict
+  class UserInfo < Binary::Structure
     char :id, 32, :desc => 'Name of the user data tag'
     u32 :user_data_ptr
   end
   
-  class ImageInfo < Dict
+  class ImageInfo < Binary::Structure
     u16 :orientation, OrientationInfo,    :desc => 'Orientation descriptor',    :req => true
     u16 :number_elements,                   :desc => 'How many elements to scan', :req => true
     
@@ -134,8 +131,8 @@ module Depix
     end
   end
   
-  #:include:DPX_HEADER_STRUCTURE.txt
-  class DPX < Dict
+  # This is the main structure represinting headers of one DPX file, see DPX_HEADER_STRUCTURE.rdoc
+  class DPX < Binary::Structure
     inner :file, FileInfo,   :desc => "File information", :req => true
     inner :image, ImageInfo, :desc => "Image information", :req => true
     inner :orientation, OrientationInfo, :desc => "Orientation", :req => true

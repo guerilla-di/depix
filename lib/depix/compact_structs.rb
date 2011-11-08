@@ -30,7 +30,7 @@ module Depix
 
   
   # A version of the DPX structure that only accounts for the values that change per frame if the ditto_key is set to 1
-  class CompactDPX < Dict
+  class CompactDPX < Binary::Structure
     inner :file, CompactInfo, :desc => "File information, only frame-transient values"
     
     inner :image, ImageInfo.filler

@@ -9,11 +9,12 @@ module Depix
     end
   
     def describe_synthetics_of_struct(struct)
-      Synthetics.instance_methods.reject{|m| m.include?('=')}.map do | m |
+      Synthetics.instance_methods.reject{|m| m.to_s.include?('=')}.map do | m |
         [m, struct.send(m)].join(' : ')
       end.unshift("============").unshift("\nSynthetic properties").join("\n")
     end
   
+    # Parse DPX headers at the start of file
     def from_file(path, compact)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
       begin
@@ -23,7 +24,7 @@ module Depix
       end
     end
   
-    # The hear of Depix
+    # Parse a DPX header (blob of bytes starting at the magic word)
     def parse(data, compact)
       magic = data[0..3]
       raise InvalidHeader, "No magic bytes found at start" unless %w( SDPX XPDS).include?(magic)
@@ -49,12 +50,12 @@ module Depix
         parts = []
         if value
           parts << field.desc if field.desc
-          parts << if field.is_a?(InnerField)
+          parts << if field.is_a?(Depix::Binary::Fields::InnerField)
             describe_struct(value, pad_offset + 1)
-          elsif field.is_a?(ArrayField)
+          elsif field.is_a?(Depix::Binary::Fields::ArrayField)
             # Exception for image elements
             value = result.image_elements[0...result.number_elements] if field.name == :image_elements
-            value.map { | v | v.is_a?(Dict) ? describe_struct(v, pad_offset + 2) : v }
+            value.map { | v | v.is_a?(Depix::Binary::Structure) ? describe_struct(v, pad_offset + 2) : v }
           else
             value
           end

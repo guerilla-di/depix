@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../lib/depix/dict'
 require 'test/unit'
 
-include Depix
+include Depix::Binary
+include Depix::Binary::Fields
 
 class BogusError < RuntimeError; end
 
@@ -515,33 +515,33 @@ class TestFieldEmit < Test::Unit::TestCase
   include FieldConformity
   
   def test_emit_short
-    f = Field.emit_u8
+    f = U8Field.new
     conform_field!(f)
     
-    f = Field.emit_u8(:desc => "Dick length")
+    f = U8Field.new(:desc => "Dick length")
     conform_field!(f)
     assert_equal "c", f.pattern
     assert_equal 1, f.length
   end
 
   def test_emit_double
-    f = Field.emit_u16
+    f = U16Field.new
     conform_field!(f)
     
-    f = Field.emit_u16(:desc => "Dick length")
+    f = U16Field.new(:desc => "Dick length")
     conform_field!(f)
     assert_equal "n", f.pattern
     assert_equal 2, f.length
   end
 
   def test_emit_char
-    f = Field.emit_char
+    f = CharField.new
     conform_field!(f)
     
     assert_equal "A1", f.pattern
     assert_equal 1, f.length
-
-    f = Field.emit_char :length => 3
+    
+    f = CharField.new :length => 3
     conform_field!(f)
     
     assert_equal "A3", f.pattern
@@ -549,7 +549,7 @@ class TestFieldEmit < Test::Unit::TestCase
   end
   
   def test_emit_float
-    f = Field.emit_r32
+    f = R32Field.new
     conform_field!(f)
     
     assert_equal "g", f.pattern
@@ -557,22 +557,22 @@ class TestFieldEmit < Test::Unit::TestCase
   end
 end
 
-class TestDict < Test::Unit::TestCase
+class TestStructure < Test::Unit::TestCase
   
   def test_dict_has_a_fields_array
-    dict_class = Class.new(Dict)
+    dict_class = Class.new(Structure)
     assert_respond_to dict_class, :fields
     assert_equal [], dict_class.fields
   end
   
   def test_dict_responds_to_validate
-    dict_class = Class.new(Dict)
+    dict_class = Class.new(Structure)
     assert_respond_to dict_class, :validate!
     one = dict_class.new
   end
   
   def test_dict_fields_array_not_class_shared
-    d1, d2 = (0..1).map{|_| Class.new(Dict) }
+    d1, d2 = (0..1).map{|_| Class.new(Structure) }
     
     d1.fields << 1
     d2.fields << 2
@@ -580,7 +580,7 @@ class TestDict < Test::Unit::TestCase
   end
   
   def test_dict_responds_to_emit_methods_from_fields
-    c = Class.new(Dict)
+    c = Class.new(Structure)
 
     emitter_methods = Field.methods.grep(/^emit_/)
     emitter_methods.each do | m |
@@ -589,16 +589,16 @@ class TestDict < Test::Unit::TestCase
   end
   
   def test_empty_dict_has_empty_template
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     assert_respond_to c, :pattern
     assert_equal '', c.pattern
     assert_equal 0, c.length
   end
 
   def test_dict_assembles_template
-    c = Class.new(Dict)
-    c.fields << Field.emit_char
-    c.fields << Field.emit_char
+    c = Class.new(Structure)
+    c.fields << CharField.new
+    c.fields << CharField.new
     
     assert_respond_to c, :pattern
     assert_equal 'A1A1', c.pattern
@@ -606,7 +606,7 @@ class TestDict < Test::Unit::TestCase
   end
 
   def test_dict_does_not_validate_inner_nil
-    wrapper_class = Class.new(Dict) do 
+    wrapper_class = Class.new(Structure) do 
       u32 :bigint
       inner :invalid, AlwaysInvalidStruct
     end
@@ -615,7 +615,7 @@ class TestDict < Test::Unit::TestCase
   end
   
   def test_dict_calls_validate
-    wrapper_class = Class.new(Dict) do 
+    wrapper_class = Class.new(Structure) do 
       u32 :bigint
       inner :invalid, AlwaysInvalidStruct, :req => true
     end
@@ -627,9 +627,9 @@ class TestDict < Test::Unit::TestCase
   end
 end
 
-class TestDictConsume < Test::Unit::TestCase
+class TestStructureConsume < Test::Unit::TestCase
   def test_dict_consume
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.char :foo
     c.char :bar
     
@@ -644,13 +644,13 @@ class TestDictConsume < Test::Unit::TestCase
   
 end
 
-class TestDictEmitDSL < Test::Unit::TestCase
+class TestStructureEmitDSL < Test::Unit::TestCase
 
   def test_dict_emit_char
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.char :tag, :desc => "Some name"
-    
-    assert c.instance_methods.include?("tag")
+    assert c.instance_methods.map{|e| e.to_s }.include?("tag"),
+      "Should create the tag accessor"
     
     assert_equal 1, c.fields.length
     field = c.fields[0]
@@ -661,10 +661,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_char_with_length
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.char :joe, 3, :desc => "Some name"
 
-    assert c.instance_methods.include?("joe")
+    assert c.instance_methods.map{|e| e.to_s }.include?("joe")
     
     assert_equal 1, c.fields.length
     field = c.fields[0]
@@ -674,10 +674,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_u32
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.u32 :num, :desc => "Huge number"
 
-    assert c.instance_methods.include?("num")
+    assert c.instance_methods.map{|e| e.to_s }.include?("num")
     
     assert_equal 1, c.fields.length
     field = c.fields[0]
@@ -687,10 +687,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_r32
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.r32 :joe, :req => true
 
-    assert c.instance_methods.include?("joe")
+    assert c.instance_methods.map{|e| e.to_s }.include?("joe")
     
     assert_equal 1, c.fields.length
     field = c.fields[0]
@@ -700,10 +700,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_u8
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.u8 :joe, :req => true
 
-    assert c.instance_methods.include?("joe")
+    assert c.instance_methods.map{|e| e.to_s }.include?("joe")
     
     assert_equal 1, c.fields.length
 
@@ -714,10 +714,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_u16
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.u16 :joe, :req => true, :desc => "A little bit of numbers"
     
-    assert c.instance_methods.include?("joe")
+    assert c.instance_methods.map{|e| e.to_s }.include?("joe")
     
     assert_equal 1, c.fields.length
 
@@ -729,10 +729,10 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_array
-    c = Class.new(Dict)
+    c = Class.new(Structure)
     c.array :point, :u32, :desc => "Two coordinates"
     
-    assert c.instance_methods.include?("point")
+    assert c.instance_methods.map{|e| e.to_s }.include?("point")
 
     assert_equal 1, c.fields.length
     field = c.fields[0]
@@ -744,12 +744,12 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_inner
-    c = Class.new(Dict)
-    c2 = Class.new(Dict)
+    c = Class.new(Structure)
+    c2 = Class.new(Structure)
     
     c.inner :nest, c2, :desc => "Nested struct"
     
-    assert c.instance_methods.include?("nest")
+    assert c.instance_methods.map{|e| e.to_s }.include?("nest")
     
     assert_equal 1, c.fields.length
     f = c.fields[0]
@@ -760,13 +760,13 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
   
   def test_dict_emit_array_of_substructs
-    c = Class.new(Dict)
-    c2 = Class.new(Dict)
+    c = Class.new(Structure)
+    c2 = Class.new(Structure)
     
     c2.u32 :some_num
     c.array :inners, c2, 8, :desc => "Inner items"
     
-    assert c.instance_methods.include?("inners")
+    assert c.instance_methods.map{|e| e.to_s }.include?("inners")
     
     assert_equal 1, c.fields.length
     f = c.fields[0]
@@ -781,9 +781,9 @@ class TestDictEmitDSL < Test::Unit::TestCase
   end
 end
 
-class TestDictCompact < Test::Unit::TestCase
+class TestStructureCompact < Test::Unit::TestCase
   def test_only_with_interspersed_fields
-    c = Class.new(Dict) do
+    c = Class.new(Structure) do
       u8 :some
       u8 :another
       u8 :third
@@ -808,7 +808,7 @@ class TestDictCompact < Test::Unit::TestCase
   end
   
   def test_only_with_fields_in_a_row
-    c = Class.new(Dict) do
+    c = Class.new(Structure) do
       u8   :some
       u32  :another
       u8   :third
@@ -833,7 +833,7 @@ class TestDictCompact < Test::Unit::TestCase
   end
   
   def test_get_filler
-    c = Class.new(Dict) do
+    c = Class.new(Structure) do
       u32 :some
     end
     
@@ -843,7 +843,7 @@ class TestDictCompact < Test::Unit::TestCase
   end
   
   def test_filler_parses_the_same
-    c = Class.new(Dict) do
+    c = Class.new(Structure) do
       u8 :first
       u8 :second
       u8 :third
@@ -865,9 +865,9 @@ class TestDictCompact < Test::Unit::TestCase
   end
 end
 
-class TestDictApply < Test::Unit::TestCase
+class TestStructureApply < Test::Unit::TestCase
   def test_apply
-    struct = Class.new(Dict) do
+    struct = Class.new(Structure) do
       char :name, "julik".length
       char :module, "depix".length
     end

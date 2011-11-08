@@ -6,7 +6,7 @@ class TestDescribe < Test::Unit::TestCase
   
   def test_desribe
     s, o, e = CLITest.new(BIN_P).run( File.dirname(__FILE__) + "/samples/gluetools_file_header.dpx")
-    assert s.zero?
-    assert o.include?("timecode:")
+    assert s.zero?, "Should exit without error"
+    assert o.include?("time_code : 03:09:00:17")
   end
 end

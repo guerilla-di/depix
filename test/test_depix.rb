@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/depix'
+require File.expand_path(File.dirname(__FILE__)) + '/../lib/depix'
 require 'test/unit'
 require "fileutils"
 
@@ -84,22 +84,19 @@ class ReaderTest < Test::Unit::TestCase
   end
   
   def test_describe
-    assert_nothing_raised do
-      desc =  Depix.describe_file(SAMPLE_DPX)
-      assert_match(/320/, desc)
-      assert_match(/Offset to data for this image element/, desc)
-    end
+    desc =  Depix.describe_file(SAMPLE_DPX)
+    assert_match(/320/, desc)
+    assert_match(/Offset to data for this image element/, desc)
   end
   
   def test_packing
     original_header = File.read(SAMPLE_DPX)[0...Depix::DPX.length]
     
-    assert_nothing_raised do
-      dpx = Depix.from_string(original_header)
-      packed =  Depix::DPX.pack(dpx, original_header.dup)
+    # If these do not raise anything we are good on the encodings front
+    dpx = Depix.from_string(original_header)
+    packed =  Depix::DPX.pack(dpx, original_header.dup)
+    dpx2 = Depix.from_string(packed)
     
-      dpx2 = Depix.from_string(packed)
-    end
   end
   
   def test_parsing_something_else_should_raise
