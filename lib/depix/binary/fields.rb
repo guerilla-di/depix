@@ -177,30 +177,19 @@ module Depix
   
   # null-terminated string field with fixed padding
   class CharField < Field
-    BLANK = "\0"
     undef :pattern=
-    
-    BLANKING_VALUES = [0x00.chr, 0xFF.chr]
-    BLANKING_PATTERNS = BLANKING_VALUES.inject([]) do | p, char |
-      p << /^([#{char}]+)/ << /([#{char}]+)$/mu
-    end
     
     def initialize(opts = {})
       super({:length => 1}.merge(opts))
     end
     
     def pattern
-      "A#{(length || 1).to_i}"
+      "Z#{length}"
     end
     
     def clean(v)
-      if v == BLANK
-        nil
-      else
-        # Truncate everything from the null byte up
-        upto_nulb = v.split(0x00.chr).shift
-        (upto_nulb.nil? || upto_nulb.empty?) ? nil : upto_nulb
-      end
+      v = pack(v.to_s).unpack(pattern)[0]
+      v.empty? ? nil : v
     end
     
     def rtype
@@ -213,7 +202,7 @@ module Depix
     end
     
     def pack(value)
-      value.ljust(length, "\000") rescue ("\000" * length)
+      [value].pack(pattern)
     end
   end
   

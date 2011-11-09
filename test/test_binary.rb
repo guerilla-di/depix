@@ -346,7 +346,7 @@ class TestCharField < Test::Unit::TestCase
   def test_char_field_pads
     f = CharField.new :name => :foo, :length => 15
     
-    assert_equal "A15", f.pattern
+    assert_equal "Z15", f.pattern
     assert_equal 15, f.length
     assert_equal String, f.rtype
   end
@@ -539,13 +539,13 @@ class TestFieldEmit < Test::Unit::TestCase
     f = CharField.new
     conform_field!(f)
     
-    assert_equal "A1", f.pattern
+    assert_equal "Z1", f.pattern
     assert_equal 1, f.length
     
     f = CharField.new :length => 3
     conform_field!(f)
     
-    assert_equal "A3", f.pattern
+    assert_equal "Z3", f.pattern
     assert_equal 3, f.length
   end
   
@@ -602,7 +602,7 @@ class TestStructure < Test::Unit::TestCase
     c.fields << CharField.new
     
     assert_respond_to c, :pattern
-    assert_equal 'A1A1', c.pattern
+    assert_equal 'Z1Z1', c.pattern
     assert_equal 2, c.length
   end
 
@@ -657,7 +657,7 @@ class TestStructureEmitDSL < Test::Unit::TestCase
     field = c.fields[0]
 
     assert_equal 1, field.length
-    assert_equal "A1", field.pattern
+    assert_equal "Z1", field.pattern
     assert_equal :tag, field.name
   end
   
@@ -670,7 +670,7 @@ class TestStructureEmitDSL < Test::Unit::TestCase
     assert_equal 1, c.fields.length
     field = c.fields[0]
     assert_equal 3, field.length
-    assert_equal "A3", field.pattern
+    assert_equal "Z3", field.pattern
     assert_equal :joe, field.name
   end
   
