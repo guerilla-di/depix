@@ -1,3 +1,6 @@
+* depix-describe renamed with a dash. Sorry folks.
+* Adds depix_fix_headers to fix wonky headers with, for instance, improper null-termination
+
 === 2.0.1 / 2011-11-09
 
 * Fix the errors in depix-describe

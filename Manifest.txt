@@ -4,7 +4,8 @@ History.txt
 Manifest.txt
 README.rdoc
 Rakefile
-bin/depix-describe
+bin/depix_describe
+bin/depix_fix_headers
 lib/depix.rb
 lib/depix/benchmark.rb
 lib/depix/binary/descriptor.rb

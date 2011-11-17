@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require File.dirname(__FILE__) + '/../lib/depix'
+require "rubygems"
+require 'optparse'
+require "progressbar"
+require "sequencer"
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: depix_fix_headers somefile.dpx anotherfile.dpx" + "\n" +
+       "For sequences: depix_fix_headers -s one_file_from_the_sequence.dpx"
+
+  opts.on("-s", "--sequence", "Detect a sequence instead (pass one file from the sequence)") do |v|
+    $sequence = true
+  end
+end.parse!
+
+files = if $sequence
+  paths = []
+  Sequencer.from_single_file(ARGV.shift).each_path do | p |
+    paths.push(p)
+  end
+  paths
+else
+  ARGV
+end
+
+raise "No files provided" unless files.any?
+
+header = "Fixing headers in %d files" % files.length
+pbar = ProgressBar.new(header, files.length)
+pbar.format = "%-#{header.length}s %3d%% %s %s"
+
+files.each do | file |
+  pbar.inc
+  Depix::Editor.new(file).commit!
+end
+puts ""

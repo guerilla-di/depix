@@ -38,6 +38,7 @@ for a short description
 == NOTES:
 
 Autodesk IFFS systems write the reel name for the file to the orientation.device field, some scanners write it into user data.
+Currently unpacking slots which contain invalid reals and ints will yield the maximum possible value for the type
 
 == REQUIREMENTS:
 

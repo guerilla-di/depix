@@ -204,7 +204,6 @@ class Depix::Binary::Structure
 
       # Validate the passed value using the format the field supports
       f.validate!(val)
-      
       packed = f.pack(val)
       
       # Signal offset violation

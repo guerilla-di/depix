@@ -1,6 +1,4 @@
-module Depix
-  module Binary
-  module Fields
+module Depix; module Binary; module Fields
   
   # Base class for a padded field in a struct
   class Field
@@ -286,6 +284,4 @@ module Depix
       cast.pack(value)
     end
   end
-end
-end
-end
+end; end; end
