@@ -19,6 +19,9 @@ Jeweler::Tasks.new do |gem|
   gem.add_dependency "timecode", "~> 1.0"
   gem.add_dependency "progressbar", "~> 0.9"
   gem.add_dependency "sequencer", "~> 1.0"
+  
+  gem.add_development_dependency "jeweler"
+  gem.add_development_dependency "rake"
   gem.add_development_dependency "cli_test", "~>1.0"
 end
 
