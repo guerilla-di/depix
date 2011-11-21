@@ -18,12 +18,15 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
+    ".gemtest",
     "DPX_HEADER_STRUCTURE.rdoc",
+    "Gemfile",
     "History.txt",
     "README.rdoc",
     "Rakefile",
     "bin/depix_describe",
     "bin/depix_fix_headers",
+    "depix.gemspec",
     "lib/depix.rb",
     "lib/depix/benchmark.rb",
     "lib/depix/binary/descriptor.rb",
@@ -60,20 +63,32 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<depix>, [">= 0"])
+      s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
       s.add_runtime_dependency(%q<timecode>, ["~> 1.0"])
       s.add_runtime_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_runtime_dependency(%q<sequencer>, ["~> 1.0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
     else
+      s.add_dependency(%q<depix>, [">= 0"])
+      s.add_dependency(%q<cli_test>, ["~> 1.0"])
       s.add_dependency(%q<timecode>, ["~> 1.0"])
       s.add_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_dependency(%q<sequencer>, ["~> 1.0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<cli_test>, ["~> 1.0"])
     end
   else
+    s.add_dependency(%q<depix>, [">= 0"])
+    s.add_dependency(%q<cli_test>, ["~> 1.0"])
     s.add_dependency(%q<timecode>, ["~> 1.0"])
     s.add_dependency(%q<progressbar>, ["~> 0.9"])
     s.add_dependency(%q<sequencer>, ["~> 1.0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<cli_test>, ["~> 1.0"])
   end
 end
