@@ -14,9 +14,6 @@ Jeweler::Tasks.new do |gem|
   gem.license = 'MIT'
   gem.executables = ["depix_describe", "depix_fix_headers"]
   gem.extra_rdoc_files  = FileList['*.rdoc']
-
-  # Do not package up test fixtures
-  gem.files.exclude ".*"
   
   # Deps
   gem.add_dependency "timecode", "~> 1.0"
