@@ -4,21 +4,22 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{depix}
+  s.name = "depix"
   s.version = "2.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Julik Tarkhanov}]
-  s.date = %q{2011-11-21}
-  s.description = %q{Allos you to edit headers and read their contents parsed into Ruby objects}
-  s.email = %q{me@julik.nl}
-  s.executables = [%q{depix_describe}, %q{depix_fix_headers}]
+  s.authors = ["Julik Tarkhanov"]
+  s.date = "2011-11-22"
+  s.description = "Allos you to edit headers and read their contents parsed into Ruby objects"
+  s.email = "me@julik.nl"
+  s.executables = ["depix_describe", "depix_fix_headers"]
   s.extra_rdoc_files = [
     "DPX_HEADER_STRUCTURE.rdoc",
     "README.rdoc"
   ]
   s.files = [
     ".gemtest",
+    ".travis.yml",
     "DPX_HEADER_STRUCTURE.rdoc",
     "Gemfile",
     "History.txt",
@@ -53,18 +54,16 @@ Gem::Specification.new do |s|
     "test/test_describe.rb",
     "test/test_fix_headers.rb"
   ]
-  s.homepage = %q{http://guerilla-di.org/depix}
-  s.licenses = [%q{MIT}]
-  s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.5}
-  s.summary = %q{Read and write DPX file headers}
+  s.homepage = "http://guerilla-di.org/depix"
+  s.licenses = ["MIT"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.11"
+  s.summary = "Read and write DPX file headers"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<depix>, [">= 0"])
-      s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
       s.add_runtime_dependency(%q<timecode>, ["~> 1.0"])
       s.add_runtime_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_runtime_dependency(%q<sequencer>, ["~> 1.0"])
@@ -72,8 +71,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
     else
-      s.add_dependency(%q<depix>, [">= 0"])
-      s.add_dependency(%q<cli_test>, ["~> 1.0"])
       s.add_dependency(%q<timecode>, ["~> 1.0"])
       s.add_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_dependency(%q<sequencer>, ["~> 1.0"])
@@ -82,8 +79,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<cli_test>, ["~> 1.0"])
     end
   else
-    s.add_dependency(%q<depix>, [">= 0"])
-    s.add_dependency(%q<cli_test>, ["~> 1.0"])
     s.add_dependency(%q<timecode>, ["~> 1.0"])
     s.add_dependency(%q<progressbar>, ["~> 0.9"])
     s.add_dependency(%q<sequencer>, ["~> 1.0"])
