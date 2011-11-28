@@ -168,6 +168,8 @@ module Depix; module Binary; module Fields
   class R32Field < Field
     undef :length=, :pattern=
     BLANK = (0xFF.chr * 4)
+    PATTERN_BE = "g"
+    PATTERN_LE = "n"
     
     def pattern
       "A4"

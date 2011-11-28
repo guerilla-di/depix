@@ -29,5 +29,6 @@ end
 task :default => [ :test ]
 
 task :document_structs do
-  File.open('DPX_HEADER_STRUCTURE.rdoc', 'w') {|f| f << Depix::Binary::Descriptor.new.get_rdoc_for(Depix::DPX) }
+  require './lib/depix/binary/descriptor'
+  File.open('DPX_HEADER_STRUCTURE.rdoc', 'w') {|f| f << Depix::Binary::RdocGenerator.new.get_rdoc_for(Depix::DPX) }
 end

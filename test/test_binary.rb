@@ -401,7 +401,7 @@ class TestFloatField < Test::Unit::TestCase
       def nan?; true; end
     end.new
     
-    assert_equal "g", f.pattern
+    assert_equal "A4", f.pattern
     assert_equal 4, f.length
     assert_equal :foo, f.name
     assert_equal Float, f.rtype
@@ -411,7 +411,8 @@ class TestFloatField < Test::Unit::TestCase
   def test_pack
     w = R32Field.new
     assert_equal "@fff", w.pack(3.6)
-    assert_equal "O\200\000\000", w.pack(nil)
+    blank = 0xFF.chr * 4
+    assert_equal blank, w.pack(nil)
   end
 end
 
@@ -558,7 +559,7 @@ class TestFieldEmit < Test::Unit::TestCase
     f = R32Field.new
     conform_field!(f)
     
-    assert_equal "g", f.pattern
+    assert_equal "A4", f.pattern
     assert_equal 4, f.length
   end
 end
@@ -716,7 +717,7 @@ class TestStructureEmitDSL < Test::Unit::TestCase
     assert_equal 1, c.fields.length
     field = c.fields[0]
     assert_equal 4, field.length
-    assert_equal "g", field.pattern
+    assert_equal "A4", field.pattern
     assert_equal true, field.req?
   end
   
