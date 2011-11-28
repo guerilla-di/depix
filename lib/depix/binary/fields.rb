@@ -52,6 +52,11 @@ module Depix; module Binary; module Fields
         [value].pack(pattern)
       end
     end
+    
+    private
+    def blanking?(blob)
+      blob.nil? || blob.empty? || blob == (0xFF.chr * length)
+    end
   end
   
   # unit32 field
@@ -143,7 +148,7 @@ module Depix; module Binary; module Fields
     end
     
     def clean(v)
-      v == BLANK ? nil : v
+      (v == BLANK || v == -1) ? nil : v
     end
     
     def validate!(value)
@@ -208,12 +213,6 @@ module Depix; module Binary; module Fields
       else
         0xFF.chr * length
       end
-    end
-    
-    private
-    
-    def blanking?(blob)
-      blob.nil? || blob.empty? || blob == (0xFF.chr * length)
     end
   end
   

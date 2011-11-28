@@ -1,5 +1,9 @@
+require "stringio"
+
 # Generates a description of the structure in RDoc format
 class Depix::Binary::Descriptor
+  include Depix::Binary::Fields
+  
   attr_accessor :io, :attr_template, :struct_template
   
   TPL = <<eof

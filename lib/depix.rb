@@ -3,6 +3,7 @@ require 'timecode'
 
 require File.expand_path(File.dirname(__FILE__)) + '/depix/binary/fields'
 require File.expand_path(File.dirname(__FILE__)) + '/depix/binary/structure'
+require File.expand_path(File.dirname(__FILE__)) + '/depix/binary/descriptor'
 
 require File.expand_path(File.dirname(__FILE__)) + '/depix/structs'
 require File.expand_path(File.dirname(__FILE__)) + '/depix/compact_structs'

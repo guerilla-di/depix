@@ -28,6 +28,6 @@ end
 
 task :default => [ :test ]
 
-task :describe_structs do
+task :document_structs do
   File.open('DPX_HEADER_STRUCTURE.rdoc', 'w') {|f| f << Depix::Binary::Descriptor.new.get_rdoc_for(Depix::DPX) }
 end

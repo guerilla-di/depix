@@ -36,7 +36,7 @@ module Depix
     #   0.480000   0.050000   0.530000 (  0.766509)
     # This is 2.5 times faster when using compact header form. The compact header form
     # is usually sufficient for reliable sequence data (it only takes fields which change)
-    # from onr frame to another.
+    # from one frame to another.
     #
     # When using the compact form a CompactDPX structure will be returned instead of the
     # full-blown DPX structure.
