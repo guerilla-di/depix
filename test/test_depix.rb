@@ -135,6 +135,14 @@ class ReaderTest < Test::Unit::TestCase
     assert_in_delta 25, dpx.film.frame_rate, 0.01
   end
   
+  def test_fields_properly_niled
+    dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/scratch.dpx")
+    assert_equal "Assimilate,SCRATCH", dpx.file.creator
+    [:project, :copyright, :encrypt_key, :reserve].each do | field |
+      assert_nil dpx.file.send(field), "#{field} should be nil"
+    end
+  end
+  
 end
 
 class EditorTest < Test::Unit::TestCase
