@@ -139,8 +139,9 @@ class ReaderTest < Test::Unit::TestCase
     dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/scratch.dpx")
     assert_equal "Assimilate,SCRATCH", dpx.file.creator
     [:project, :copyright, :encrypt_key, :reserve].each do | field |
-      assert_nil dpx.file.send(field), "#{field} should be nil"
+      assert_nil dpx.file.send(field), "The blanking field #{field.inspect} should have been decoded as nil"
     end
+    
   end
   
 end
