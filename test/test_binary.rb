@@ -385,8 +385,8 @@ class TestCharField < Test::Unit::TestCase
   def test_char_field_packs
     f = CharField.new(:length => 6)
     assert_equal "xx\000\000\000\000", f.pack("xx")
-    assert_equal "\000\000\000\000\000\000", f.pack("")
-    assert_equal "\000\000\000\000\000\000", f.pack(nil)
+    assert_equal "\xFF\xFF\xFF\xFF\xFF\xFF", f.pack("")
+    assert_equal "\xFF\xFF\xFF\xFF\xFF\xFF", f.pack(nil)
   end
 end
 

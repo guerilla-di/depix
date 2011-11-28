@@ -206,7 +206,7 @@ module Depix; module Binary; module Fields
       unless blanking?(value)
         [value].pack(pattern)
       else
-        0x00.chr * length
+        0xFF.chr * length
       end
     end
     
