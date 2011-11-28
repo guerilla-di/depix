@@ -27,7 +27,19 @@ module Depix
       end
     end
   
-    # Parse a DPX header (blob of bytes starting at the magic word)
+    # Parse a DPX header (blob of bytes starting at the magic word). The "compact"
+    # flag specifies whether a full-blown parser has to be used. This has substantial
+    # speed implications. For example:
+    # Reading DPX header 1000 times, all data
+    #   1.220000   0.080000   1.300000 (  1.898979)
+    # Reading DPX header 1000 times, compact data
+    #   0.480000   0.050000   0.530000 (  0.766509)
+    # This is 2.5 times faster when using compact header form. The compact header form
+    # is usually sufficient for reliable sequence data (it only takes fields which change)
+    # from onr frame to another.
+    #
+    # When using the compact form a CompactDPX structure will be returned instead of the
+    # full-blown DPX structure.
     def parse(data, compact)
       magic = data[0..3]
       raise InvalidHeader, "No magic bytes found at start" unless %w( SDPX XPDS).include?(magic)
