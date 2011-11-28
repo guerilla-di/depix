@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
-  s.date = "2011-11-22"
+  s.date = "2011-11-28"
   s.description = "Allos you to edit headers and read their contents parsed into Ruby objects"
   s.email = "me@julik.nl"
   s.executables = ["depix_describe", "depix_fix_headers"]
@@ -37,7 +37,6 @@ Gem::Specification.new do |s|
     "lib/depix/editor.rb",
     "lib/depix/enums.rb",
     "lib/depix/reader.rb",
-    "lib/depix/struct_explainer.rb",
     "lib/depix/structs.rb",
     "lib/depix/synthetics.rb",
     "test/samples/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx",
@@ -49,6 +48,7 @@ Gem::Specification.new do |s|
     "test/samples/gluetools_file_header.dpx",
     "test/samples/little_endian.dpx",
     "test/samples/northlight_tc_mode_mismatch.dpx",
+    "test/samples/scratch.dpx",
     "test/test_binary.rb",
     "test/test_depix.rb",
     "test/test_describe.rb",
@@ -67,6 +67,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<timecode>, ["~> 1.0"])
       s.add_runtime_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_runtime_dependency(%q<sequencer>, ["~> 1.0"])
+      s.add_runtime_dependency(%q<term-ansicolor>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
@@ -74,6 +75,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<timecode>, ["~> 1.0"])
       s.add_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_dependency(%q<sequencer>, ["~> 1.0"])
+      s.add_dependency(%q<term-ansicolor>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<cli_test>, ["~> 1.0"])
@@ -82,6 +84,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<timecode>, ["~> 1.0"])
     s.add_dependency(%q<progressbar>, ["~> 0.9"])
     s.add_dependency(%q<sequencer>, ["~> 1.0"])
+    s.add_dependency(%q<term-ansicolor>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<cli_test>, ["~> 1.0"])

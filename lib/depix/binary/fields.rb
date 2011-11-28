@@ -203,13 +203,17 @@ module Depix; module Binary; module Fields
     end
     
     def pack(value)
-      [value].pack(pattern)
+      unless blanking?(value)
+        [value].pack(pattern)
+      else
+        0x00.chr * length
+      end
     end
     
     private
     
     def blanking?(blob)
-      blob.empty? || blob == (0xFF.chr * length)
+      blob.nil? || blob.empty? || blob == (0xFF.chr * length)
     end
   end
   
