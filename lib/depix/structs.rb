@@ -18,7 +18,7 @@ module Depix
     char :copyright, 200, :desc => 'Copyright'
     
     u32  :encrypt_key,    :desc => 'Encryption key'
-    char :reserve, 104
+    blanking :reserve, 104
   end
   
   class FilmInfo < Binary::Structure
@@ -38,7 +38,7 @@ module Depix
 
     char :frame_id, 32,   :desc => 'Frame identification (keyframe)' 
     char :slate, 100,     :desc => 'Slate information'
-    char :reserve, 56
+    blanking :reserve, 56
   end
   
   class ImageElement < Binary::Structure
@@ -82,7 +82,7 @@ module Depix
     array :border, :u16, 4, :desc => 'Border validity: XL, XR, YT, YB'
     array :aspect_ratio , :u32, 2, :desc => "Aspect (H:V)"
     
-    char :reserve, 28
+    blanking :reserve, 28
   end
   
   class TelevisionInfo < Binary::Structure
@@ -104,7 +104,7 @@ module Depix
     r32 :break_point,            :desc => 'Break point (?)'
     r32 :white_level,            :desc => 'White level'
     r32 :integration_times,      :desc => 'Integration times (S)'
-    r32 :reserve
+    blanking :reserve, 4 # As long as a real
   end
   
   class UserInfo < Binary::Structure
@@ -123,7 +123,7 @@ module Depix
       elements[0].req = true
     end
     
-    char :reserve, 52
+    blanking :reserve, 52
     
     # Only expose the elements present
     def image_elements #:nodoc:

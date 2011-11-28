@@ -2,12 +2,13 @@ module Depix; module Binary; module Fields
   
   # Base class for a padded field in a struct
   class Field
-    attr_accessor :name, # Field name
-                  :length, # Field length in bytes, including any possible padding
-                  :pattern, # The unpack pattern that defines the field
-                  :req, # Is the field required?
-                  :desc, # Field description
-                  :rtype  # To which Ruby type this has to be cast (and which type is accepted as value)
+    attr_accessor :name # Field name
+    attr_accessor :length # Field length in bytes, including any possible padding
+    attr_accessor :pattern # The unpack pattern that defines the field
+    attr_accessor :req # Is the field required?
+    attr_accessor :desc # Field description
+    attr_accessor :rtype  # To which Ruby type this has to be cast (and which type is accepted as value)
+    
     alias_method :req?, :req
     
     # Hash init
@@ -186,8 +187,10 @@ module Depix; module Binary; module Fields
     end
     
     def clean(v)
+      # Use the pack->unpack trick to remove null-termination
       v = pack(v.to_s).unpack(pattern)[0]
-      v.empty? ? nil : v
+      # Blanked fields are 0xFF all the way
+      blanking?(v) ? nil : v
     end
     
     def rtype
@@ -201,6 +204,36 @@ module Depix; module Binary; module Fields
     
     def pack(value)
       [value].pack(pattern)
+    end
+    
+    private
+    
+    def blanking?(blob)
+      blob.empty? || blob == (0xFF.chr * length)
+    end
+  end
+  
+  # For reserved fields and blanking 
+  class BlankingField < CharField
+    
+    def validate!(value)
+      raise "The value of this field should be nil" unless value.nil?
+    end
+    
+    def pattern
+      "Z#{length}"
+    end
+    
+    def clean(v)
+      nil
+    end
+    
+    def rtype
+      NilClass
+    end
+    
+    def pack(value)
+      0xFF.chr * length
     end
   end
   

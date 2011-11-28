@@ -63,8 +63,14 @@ class Depix::Binary::Structure
     attr_accessor name
     fields << U16Field.new( {:name => name }.merge(opts) )
   end
-
-
+  
+  # Define a blanking field (it's return value is always nil)
+  def self.blanking(name, *extras)
+    length, opts = count_and_opts_from(extras)
+    attr_accessor name
+    fields << BlankingField.new( {:name => name, :length => length}.merge(opts) )
+  end
+  
   # Define a small unsigned integer
   def self.u8(name, *extras)
     count, opts = count_and_opts_from(extras)

@@ -1,5 +1,5 @@
 # Generates a description of the structure in RDoc format
-class Depix::Binary::StructureExplainer
+class Depix::Binary::Descriptor
   attr_accessor :io, :attr_template, :struct_template
   
   TPL = <<eof

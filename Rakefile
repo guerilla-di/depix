@@ -29,6 +29,5 @@ end
 task :default => [ :test ]
 
 task :describe_structs do
-  require File.dirname(__FILE__) + '/lib/depix/struct_explainer'
-  File.open('DPX_HEADER_STRUCTURE.rdoc', 'w') {|f| f << RdocExplainer.new.get_rdoc_for(Depix::DPX) }
+  File.open('DPX_HEADER_STRUCTURE.rdoc', 'w') {|f| f << Depix::Binary::Descriptor.new.get_rdoc_for(Depix::DPX) }
 end

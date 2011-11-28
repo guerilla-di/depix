@@ -54,11 +54,18 @@ module Depix::Synthetics
   
   # Aspect in it's traditional representation (1.77 for 16x9 and so on)
   def aspect
+    #raise [orientation.aspect_ratio[0].to_f, orientation.aspect_ratio[1].to_f].inspect
+    
     "%.2f" % (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
   end
   
   # Is this DPX file little-endian?
-  def le?
+  def little_endian?
     file.magic == 'XPDS'
+  end
+  
+  def le?
+    # $stderr.puts "Depix::Synthetics.le? is deprecated, use little_endian? instead"
+    little_endian?
   end
 end

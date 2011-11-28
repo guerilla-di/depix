@@ -1,3 +1,8 @@
+# coding: US-ASCII
+
+# Pay attention. The test verifies packing into bit blobs. These are much nahdier
+# to compare and check as US-ASCII. Even though I am completely into Unicode this is exactly
+# the moment to NOT use it.
 require 'test/unit'
 require File.dirname(__FILE__) + '/../lib/depix' unless defined?(Depix)
 
@@ -330,7 +335,7 @@ class TestWideIntField < Test::Unit::TestCase
   def test_pack
     w = U32Field.new
     assert_equal "\000\000\000\036", w.pack(30)
-    assert_equal "\377\377\377\377", w.pack(nil)
+    assert_equal "\xFF\xFF\xFF\xFF", w.pack(nil)
   end
 end
 
@@ -646,7 +651,22 @@ class TestStructureConsume < Test::Unit::TestCase
 end
 
 class TestStructureEmitDSL < Test::Unit::TestCase
-
+  
+  def test_dict_emit_char
+    c = Class.new(Structure)
+    c.blanking :reserved, :length => 48, :desc => "Reserved"
+    assert c.instance_methods.map{|e| e.to_s }.include?("reserved"),
+      "Should create the tag accessor"
+    
+    assert_equal 1, c.fields.length
+    field = c.fields[0]
+    
+    assert_equal 48, field.length
+    assert_equal "Z48", field.pattern
+    assert_equal :reserved, field.name
+  end
+  
+  
   def test_dict_emit_char
     c = Class.new(Structure)
     c.char :tag, :desc => "Some name"

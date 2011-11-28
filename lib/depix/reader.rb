@@ -1,6 +1,9 @@
+require 'term/ansicolor'
+
 module Depix
   class Reader
-  
+    include Term::ANSIColor
+    
     # Returns a printable report on all the headers present in the file at the path passed
     def describe_file(path, compact = false)
       header = File.open(path, 'r') { |f| f.read(DPX.length) }
@@ -49,15 +52,15 @@ module Depix
         value = result.send(field.name)
         parts = []
         if value
-          parts << field.desc if field.desc
+          parts << " " * pad_offset
+          parts << red { field.name.to_s }
+          parts << "(#{field.desc})" if field.desc
           parts << if field.is_a?(Depix::Binary::Fields::InnerField)
             describe_struct(value, pad_offset + 1)
           elsif field.is_a?(Depix::Binary::Fields::ArrayField)
-            # Exception for image elements
-            value = result.image_elements[0...result.number_elements] if field.name == :image_elements
             value.map { | v | v.is_a?(Depix::Binary::Structure) ? describe_struct(v, pad_offset + 2) : v }
           else
-            value
+            blue { value.to_s }
           end
         end
         if parts.any?
