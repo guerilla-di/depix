@@ -27,13 +27,24 @@ have the same name as the specified fields.
 
 The gem also contains an executable called depix-desribe which can be used from the command line
   
-  $book depix-describe 001_PTAPE_001.001.dpx
+  $depix_describe 001_PTAPE_001.001.dpx
 
 for a long description or 
 
-  $book depix-describe -s 001_PTAPE_001.001.dpx 
+  $depix_describe -s 001_PTAPE_001.001.dpx 
 
-for a short description
+for a short description.
+
+If you have a file that does not import into some application you could run "fix headers" on it to comb
+out invalid data (or data some systems do not approve of). To do so, run depix_fix_headers. Note that the files
+will be modified in-place
+
+  $depix_fix_headers 001_PTAPE_001.001.dpx
+
+or for a whole sequence - just supply the -s flag and pass one file
+
+  $depix_fix_headers -s 001_PTAPE_001.001.dpx
+
 
 == NOTES:
 
