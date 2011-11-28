@@ -138,12 +138,13 @@ class ReaderTest < Test::Unit::TestCase
   def test_fields_properly_niled
     dpx = Depix.from_file(File.dirname(__FILE__) + "/samples/scratch.dpx")
     assert_equal "Assimilate,SCRATCH", dpx.file.creator
+    assert_nil dpx.television.gamma, "television.gamma should have been decoded to nil"
+    assert_nil television.field_number, "field_number should have been decoded to nil"
+    
     [:project, :copyright, :encrypt_key, :reserve].each do | field |
       assert_nil dpx.file.send(field), "The blanking field #{field.inspect} should have been decoded as nil"
     end
-    assert_nil  dpx.television.gamma, "television.gamma should have been decoded to nil"
   end
-  
 end
 
 class EditorTest < Test::Unit::TestCase
