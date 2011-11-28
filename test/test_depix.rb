@@ -141,7 +141,7 @@ class ReaderTest < Test::Unit::TestCase
     [:project, :copyright, :encrypt_key, :reserve].each do | field |
       assert_nil dpx.file.send(field), "The blanking field #{field.inspect} should have been decoded as nil"
     end
-    
+    assert_nil  dpx.television.gamma, "television.gamma should have been decoded to nil"
   end
   
 end
