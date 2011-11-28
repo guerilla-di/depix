@@ -5,7 +5,7 @@ require 'optparse'
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: depix-describe somefile.dpx anotherfile.dpx [options]"
+  opts.banner = "Usage: depix_describe somefile.dpx anotherfile.dpx [options]"
 
   opts.on("-c", "--compact", "Compact output (only fields that change per frame)") do |v|
     options[:compact] = true
@@ -18,6 +18,7 @@ OptionParser.new do |opts|
 end.parse!
 
 ARGV.each do | file |
+  puts "\n"
   puts "Describing DPX #{file}. Empty elements are omitted."
   puts "===================================================\n"
   begin
