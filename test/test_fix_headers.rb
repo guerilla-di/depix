@@ -12,8 +12,6 @@ class TestFixHeaders < Test::Unit::TestCase
       FileUtils.cp(from_file, to_file)
       s, o, e = CLITest.new(BIN_P).run(to_file)
       assert s.zero?, "Should exit without error"
-      
-      puts Depix.from_file(to_file).inspect
     ensure
       File.unlink(to_file)
     end

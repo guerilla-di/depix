@@ -157,17 +157,29 @@ module Depix; module Binary; module Fields
     end
   end
   
-  # real32 field
+  # real32 field. Now, there is some lap dancing to be done here.
+  # The DPX files in the wild define nonexistant data as a charfield with all
+  # it's bits set (four times 0xFF byte). This is easy to verify with a string
+  # but practically useless once the charfield has been unpacked into a float.
+  # Therefore we first unpack the value as a charfield, then we check whether it's all
+  # blanking, and if it is we return nil. If it's not "all bits set" though what we will do
+  # is try to decode it again using the real float unpack pattern. The same dance
+  # happens reciprocally when repacking the data.
   class R32Field < Field
     undef :length=, :pattern=
-    BLANK = 0xFFFFFFFF
+    BLANK = (0xFF.chr * 4)
     
     def pattern
-      "g"
+      "A4"
     end
     
     def clean(v)
-      v.nan? ? nil : v
+      if v == [BLANK]
+        nil
+      else
+        value = v.unpack("g").shift
+        (value.nil? || value.nan?) ? nil : value
+      end
     end
     
     def length
@@ -176,6 +188,10 @@ module Depix; module Binary; module Fields
     
     def rtype
       Float
+    end
+    
+    def pack(value)
+      value.nil? ? BLANK : [value].pack("g")
     end
   end
   

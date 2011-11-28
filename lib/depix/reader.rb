@@ -12,9 +12,12 @@ module Depix
     end
   
     def describe_synthetics_of_struct(struct)
-      Synthetics.instance_methods.reject{|m| m.to_s.include?('=')}.map do | m |
-        [m, struct.send(m)].join(' : ')
-      end.unshift("============").unshift("\nSynthetic properties").join("\n")
+      fields = Synthetics.instance_methods.reject{|m| m.to_s.include?('=')}.map do | m |
+        [red{ m.to_s }, blue { struct.send(m).to_s }].join(' : ')
+      end
+      fields.unshift("============")
+      fields.unshift(bold { "\nSynthetic properties" })
+      fields.join("\n")
     end
   
     # Parse DPX headers at the start of file
@@ -70,7 +73,7 @@ module Depix
           parts << if field.is_a?(Depix::Binary::Fields::InnerField)
             describe_struct(value, pad_offset + 1)
           elsif field.is_a?(Depix::Binary::Fields::ArrayField)
-            value.map { | v | v.is_a?(Depix::Binary::Structure) ? describe_struct(v, pad_offset + 2) : v }
+            value.map { | v | v.is_a?(Depix::Binary::Structure) ? describe_struct(v, pad_offset + 1) : v }
           else
             blue { value.to_s }
           end
