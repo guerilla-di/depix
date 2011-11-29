@@ -6,7 +6,7 @@ Jeweler::Tasks.new do |gem|
   gem.version = Depix::VERSION
   gem.name = "depix"
   gem.summary = "Read and write DPX file headers"
-  gem.description = "Allos you to edit headers and read their contents parsed into Ruby objects"
+  gem.description = "Allows you to read and edit DPX file headers parsed into Ruby objects"
   gem.email = "me@julik.nl"
   gem.homepage = "http://guerilla-di.org/depix"
   gem.authors = ["Julik Tarkhanov"]
