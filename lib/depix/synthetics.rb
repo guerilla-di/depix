@@ -54,8 +54,7 @@ module Depix::Synthetics
   
   # Aspect in it's traditional representation (1.77 for 16x9 and so on)
   def aspect
-    #raise [orientation.aspect_ratio[0].to_f, orientation.aspect_ratio[1].to_f].inspect
-    
+    # FIXME - now returns the pixel aspect
     "%.2f" % (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
   end
   
