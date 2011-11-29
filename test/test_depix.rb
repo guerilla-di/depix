@@ -65,7 +65,7 @@ class ReaderTest < Test::Unit::TestCase
   
   def test_syntethics
     assert_nothing_raised { Depix::Synthetics }
-
+    
     file = SAMPLE_DPX
     parsed = Depix.from_file(file)
     assert_equal false, parsed.le?
@@ -74,7 +74,16 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal :RGB, parsed.component_type
     assert_equal :Linear, parsed.colorimetric
     assert_equal "E012", parsed.flame_reel
-    assert_equal "1.33", parsed.aspect
+    assert_equal "1.78", parsed.aspect
+    
+    file = File.dirname(SAMPLE_DPX) + "/scratch.dpx"
+    parsed = Depix.from_file(file)
+    assert_equal 1, parsed.pixel_aspect, "Should parse square pixels"
+    assert_equal "1.78", parsed.aspect, "Should parse 16x9 aspect"
+    
+    file = File.dirname(SAMPLE_DPX) + "/026_FROM_HERO_TAPE_5-3-1_MOV.0029.dpx"
+    parsed = Depix.from_file(file)
+    assert_equal "2.37", parsed.aspect, "Should parse 2.37 Viper aspect"
   end
   
   def test_parsed_properly_using_compact_structs

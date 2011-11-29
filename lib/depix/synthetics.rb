@@ -52,10 +52,14 @@ module Depix::Synthetics
     Depix::COMPONENT_TYPE.invert[image.image_elements[0].descriptor]
   end
   
+  # Returns the pixel aspect
+  def pixel_aspect
+    (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
+  end
+  
   # Aspect in it's traditional representation (1.77 for 16x9 and so on)
   def aspect
-    # FIXME - now returns the pixel aspect
-    "%.2f" % (orientation.aspect_ratio[0].to_f / orientation.aspect_ratio[1].to_f)
+    "%.2f" % (image.pixels_per_line / image.lines_per_element.to_f * pixel_aspect)
   end
   
   # Is this DPX file little-endian?
