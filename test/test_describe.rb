@@ -12,10 +12,15 @@ class TestDescribe < Test::Unit::TestCase
     assert o.include?("03:09:00:17"), "Should include the timecode"
   end
   
-  def test_class
+  def test_describe_class_simple
     desc =  Depix::Describe.new.describe(SAMPLE_DPX)
     assert_match(/320/, desc)
     assert_match(/Offset to data for this image element/, desc)
+  end
+  
+  def test_describe_synthetics
+    desc =  Depix::Describe.new.describe_synthetics(SAMPLE_DPX, false)
+    assert desc.include?("01:15:11:18")
   end
   
 end

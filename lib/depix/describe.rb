@@ -8,20 +8,14 @@ class Depix::Describe
     describe_struct(struct) + describe_synthetics_of_struct(struct)
   end
   
-  def describe_synthetics(path)
+  # Returns descriptions of the shorthand synthetic properties
+  def describe_synthetics(path, compact)
     struct = Depix.from_file(path, compact)
     describe_synthetics_of_struct(struct)
   end
   
-  def describe_synthetics_of_struct(struct)
-    fields = Depix::Synthetics.instance_methods.reject{|m| m.to_s.include?('=')}.map do | m |
-      [red{ m.to_s }, blue { struct.send(m).to_s }].join(' : ')
-    end
-    fields.unshift("============")
-    fields.unshift(bold { "\nSynthetic properties" })
-    fields.join("\n")
-  end
-
+  private
+  
   # Describe a filled DPX structure
   def describe_struct(result, pad_offset = 0)
     result.class.fields.inject([]) do | info, field |
@@ -45,4 +39,15 @@ class Depix::Describe
       info
     end.map{|e| ('  ' * pad_offset) + e }.join("\n")
   end
+  
+  
+  def describe_synthetics_of_struct(struct)
+    fields = Depix::Synthetics.instance_methods.reject{|m| m.to_s.include?('=')}.map do | m |
+      [red{ m.to_s }, blue { struct.send(m).to_s }].join(' : ')
+    end
+    fields.unshift("============")
+    fields.unshift(bold { "\nSynthetic properties" })
+    fields.join("\n")
+  end
+
 end
