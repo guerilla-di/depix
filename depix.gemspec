@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
   s.date = "2011-11-29"
-  s.description = "Allos you to edit headers and read their contents parsed into Ruby objects"
+  s.description = "Allows you to read and edit DPX file headers parsed into Ruby objects"
   s.email = "me@julik.nl"
   s.executables = ["depix_describe", "depix_fix_headers"]
   s.extra_rdoc_files = [
@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_runtime_dependency(%q<sequencer>, ["~> 1.0"])
       s.add_runtime_dependency(%q<term-ansicolor>, [">= 0"])
+      s.add_runtime_dependency(%q<update_hints>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<cli_test>, ["~> 1.0"])
@@ -76,6 +77,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<progressbar>, ["~> 0.9"])
       s.add_dependency(%q<sequencer>, ["~> 1.0"])
       s.add_dependency(%q<term-ansicolor>, [">= 0"])
+      s.add_dependency(%q<update_hints>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<cli_test>, ["~> 1.0"])
@@ -85,6 +87,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<progressbar>, ["~> 0.9"])
     s.add_dependency(%q<sequencer>, ["~> 1.0"])
     s.add_dependency(%q<term-ansicolor>, [">= 0"])
+    s.add_dependency(%q<update_hints>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<cli_test>, ["~> 1.0"])
