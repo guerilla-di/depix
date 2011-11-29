@@ -12,6 +12,7 @@ require File.expand_path(File.dirname(__FILE__)) + '/depix/synthetics'
 require File.expand_path(File.dirname(__FILE__)) + '/depix/reader'
 require File.expand_path(File.dirname(__FILE__)) + '/depix/editor'
 
+require File.expand_path(File.dirname(__FILE__)) + '/depix/describe'
 
 module Depix
   VERSION = '2.0.1'
@@ -31,15 +32,4 @@ module Depix
   def self.from_string(string, compact = false)
     Reader.new.parse(string, compact)
   end
-  
-  # Retrurn a formatted description of the DPX file at path. Empty values are omitted.
-  def self.describe_file(path, compact = false)
-    Reader.new.describe_file(path, compact)
-  end
-  
-  # Return a formatted description of the DPX file at path, showing only synthetic attributes
-  def self.describe_brief(path)
-    Reader.new.describe_synthetics_of_struct(from_file(path))
-  end
-  
 end

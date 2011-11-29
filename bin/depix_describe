@@ -23,11 +23,11 @@ ARGV.each do | file |
   puts "===================================================\n"
   begin
     if options[:synthetics]
-      puts Depix.describe_brief(file)
+      puts Depix::Describe.new.describe_brief(file)
     elsif options[:compact]
-      puts Depix.describe_file(file, true)
+      puts Depix::Describe.new.describe(file, true)
     else
-      puts Depix.describe_file(file)
+      puts Depix::Describe.new.describe(file)
     end
   rescue Depix::InvalidHeader
     puts " - Invalid header data"
