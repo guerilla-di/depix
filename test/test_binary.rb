@@ -1,4 +1,4 @@
-# coding: US-ASCII
+# coding: ASCII-8BIT
 
 # Pay attention. The test verifies packing into bit blobs. These are much nahdier
 # to compare and check as US-ASCII. Even though I am completely into Unicode this is exactly
@@ -233,13 +233,13 @@ class TestArrayField < Test::Unit::TestCase
   
   def test_pack_pads_properly
     f = ArrayField.new :members => [U32Field.new, R32Field.new, R32Field.new]
-    assert_equal "\000\000\000\001@\000\000\000\377\377\377\377", f.pack([1.0, 2.0])
+    assert_equal "\x00\x00\x00\x1A?\x80\x00\x00@\x00\x00\x00", f.pack([26,1.0, 2.0])
     assert_equal f.length, f.pack([1.0, 2.0]).length
   end
 
   def test_does_not_try_to_pack_nil_values
     f = ArrayField.new(:members => [AlwaysInvalidField.new(:length => 2)])
-    assert_equal "\377\377", f.pack([])
+    assert_equal 0xFF.chr * 2, f.pack([nil])
   end
 
 end
@@ -397,7 +397,7 @@ class TestFloatField < Test::Unit::TestCase
     f = R32Field.new :name  => :foo
     conform_field!(f)
     
-    assert_equal "A4", f.pattern
+    assert_equal "g", f.pattern
     assert_equal 4, f.length
     assert_equal :foo, f.name
     assert_equal Float, f.rtype
@@ -554,7 +554,7 @@ class TestFieldEmit < Test::Unit::TestCase
     f = R32Field.new
     conform_field!(f)
     
-    assert_equal "A4", f.pattern
+    assert_equal "g", f.pattern
     assert_equal 4, f.length
   end
 end
@@ -712,7 +712,7 @@ class TestStructureEmitDSL < Test::Unit::TestCase
     assert_equal 1, c.fields.length
     field = c.fields[0]
     assert_equal 4, field.length
-    assert_equal "A4", field.pattern
+    assert_equal "g", field.pattern
     assert_equal true, field.req?
   end
   

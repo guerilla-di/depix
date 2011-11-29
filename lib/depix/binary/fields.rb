@@ -1,3 +1,4 @@
+# coding: ASCII-8BIT
 module Depix; module Binary; module Fields
   
   # Base class for a padded field in a struct
@@ -88,7 +89,7 @@ module Depix; module Binary; module Fields
   # uint8 field
   class U8Field < Field
     undef :length=, :pattern=
-
+    
     BLANK = 0xFF
 
     def pattern
@@ -155,6 +156,7 @@ module Depix; module Binary; module Fields
       super(value)
       raise "#{name} value #{value} out of bounds for 16bit unsigned int" if (value < 0 || value >= BLANK)
     end
+    
   end
   
   # real32 field. Now, there is some lap dancing to be done here.
@@ -172,16 +174,11 @@ module Depix; module Binary; module Fields
     PATTERN_LE = "n"
     
     def pattern
-      "A4"
+      "g"
     end
     
     def clean(v)
-      if v == [BLANK]
-        nil
-      else
-        value = v.unpack("g").shift
-        (value.nil? || value.nan?) ? nil : value
-      end
+      (v.nil? || v.nan?) ? nil : v
     end
     
     def length
@@ -192,8 +189,14 @@ module Depix; module Binary; module Fields
       Float
     end
     
+    # The packing of NaN
+    # [12] pry(main)> value = 0 / 0.0
+    # => NaN
+    # [13] pry(main)> [value].pack("g")
+    # => "\xFF\xC0\x00\x00"
+    # [14] pry(main)> [value].pack("g")
     def pack(value)
-      value.nil? ? BLANK : [value].pack("g")
+      (value.nil? || value.nan? ) ? BLANK : [value].pack("g")
     end
   end
   

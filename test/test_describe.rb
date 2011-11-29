@@ -9,7 +9,7 @@ class TestDescribe < Test::Unit::TestCase
   def test_app
     s, o, e = CLITest.new(BIN_P).run( File.dirname(__FILE__) + "/samples/gluetools_file_header.dpx")
     assert s.zero?, "Should exit without error"
-    assert o.include?("time_code : 03:09:00:17"), "Should include the timecode"
+    assert o.include?("03:09:00:17"), "Should include the timecode"
   end
   
   def test_class

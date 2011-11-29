@@ -188,7 +188,7 @@ class Depix::Binary::Structure
   def self.pack(instance, buffer = nil)
     
     # Preallocate a buffer just as big as me since we want everything to remain at fixed offsets
-    buffer ||= ("\000" * length)
+    buffer ||= (0xFF.chr * length)
     
     # We need to enforce ASCII-8bit encoding which in Ruby parlance is actually "bytestream"
     byteify_string(buffer) unless RUBY_VERSION < '1.9.0'
