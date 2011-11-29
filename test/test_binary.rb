@@ -397,15 +397,10 @@ class TestFloatField < Test::Unit::TestCase
     f = R32Field.new :name  => :foo
     conform_field!(f)
     
-    the_nan = Class.new do
-      def nan?; true; end
-    end.new
-    
     assert_equal "A4", f.pattern
     assert_equal 4, f.length
     assert_equal :foo, f.name
     assert_equal Float, f.rtype
-    assert_equal nil, f.clean(the_nan)
   end
   
   def test_pack

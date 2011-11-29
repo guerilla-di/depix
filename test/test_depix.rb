@@ -45,8 +45,7 @@ class ReaderTest < Test::Unit::TestCase
     assert_equal 0,     ie.end_of_line_padding
     assert_equal 0,     ie.end_of_image_padding
     assert_equal "IMAGE DESCRIPTION DATA        ", ie.description
-    assert_equal "E012", 
-      parsed.orientation.device #- this is where Flame writes the reel
+    assert_equal "E012", parsed.orientation.device #- this is where Flame writes the reel
     
     assert_equal 853, parsed.orientation.aspect_ratio[0]
     assert_equal 640, parsed.orientation.aspect_ratio[1]
@@ -81,12 +80,6 @@ class ReaderTest < Test::Unit::TestCase
   def test_parsed_properly_using_compact_structs
     file = SAMPLE_DPX
     assert_nothing_raised { Depix.from_file(file, compact = true) }
-  end
-  
-  def test_describe
-    desc =  Depix.describe_file(SAMPLE_DPX)
-    assert_match(/320/, desc)
-    assert_match(/Offset to data for this image element/, desc)
   end
   
   def test_packing
