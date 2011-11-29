@@ -2,6 +2,7 @@
 
 require File.dirname(__FILE__) + '/../lib/depix'
 require 'optparse'
+require "update_hints"
 
 options = {}
 OptionParser.new do |opts|
@@ -33,3 +34,4 @@ ARGV.each do | file |
     puts " - Invalid header data"
   end
 end
+UpdateHints.version_check("depix", Depix::VERSION)

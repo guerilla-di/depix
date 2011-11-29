@@ -88,7 +88,29 @@ class ReaderTest < Test::Unit::TestCase
   
   def test_parsed_properly_using_compact_structs
     file = SAMPLE_DPX
-    assert_nothing_raised { Depix.from_file(file, compact = true) }
+    
+    parsed = Depix.from_file(file, compact = true)
+    assert_equal "SDPX", parsed.file.magic
+    assert_equal 8192, parsed.file.image_offset
+    assert_equal 1, parsed.file.ditto_key
+    assert_equal "E012_P001_L000002_lin.0001.dpx", parsed.file.filename
+    assert_equal "2008:12:19:01:18:37:CEST", parsed.file.timestamp
+    
+    assert_equal "E012", parsed.orientation.device #- this is where Flame writes the reel
+    
+    assert_equal 853, parsed.orientation.aspect_ratio[0]
+    assert_equal 640, parsed.orientation.aspect_ratio[1]
+    
+    assert_equal '75', parsed.film.id
+    assert_equal '00', parsed.film.type
+    assert_equal '19', parsed.film.offset
+    assert_equal '740612', parsed.film.prefix
+    assert_equal '9841', parsed.film.count
+    assert_equal 1, parsed.film.frame_position
+    assert_equal 2, parsed.film.sequence_extent
+    assert_equal 25.0, parsed.film.frame_rate
+    assert_equal 18157848, parsed.television.time_code
+    assert_equal 0, parsed.television.user_bits
   end
   
   def test_packing

@@ -5,7 +5,8 @@ module Depix
     :magic,
     :ditto_key,
     :filename,
-    :timestamp 
+    :timestamp,
+    :image_offset 
   )
   
   
@@ -14,7 +15,12 @@ module Depix
     :count,
     :frame_position,
     :frame_id,
-    :slate
+    :slate,
+    :id,
+    :type,
+    :prefix,
+    :sequence_extent,
+    :frame_rate
   )
   
   CompactOrientation = OrientationInfo.only(
