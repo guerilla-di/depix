@@ -1,6 +1,12 @@
+=== 3.0.0 / 2011-11-29
+
 * Use jeweler for gem builds
 * depix-describe renamed with a dash. Sorry folks.
 * Adds depix_fix_headers to fix wonky headers with, for instance, improper null-termination
+* Multiple bug fixes
+  * Padded reserved fields not shown anymore
+  * More fields that have invalid values resolve to nil now
+  * fixed that Synthetics#aspect would return pixel aspect and not image aspect
 
 === 2.0.1 / 2011-11-09
 
