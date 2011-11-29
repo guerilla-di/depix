@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "depix"
-  s.version = "2.0.1"
+  s.version = "3.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
-  s.date = "2011-11-28"
+  s.date = "2011-11-29"
   s.description = "Allos you to edit headers and read their contents parsed into Ruby objects"
   s.email = "me@julik.nl"
   s.executables = ["depix_describe", "depix_fix_headers"]
@@ -29,11 +29,11 @@ Gem::Specification.new do |s|
     "bin/depix_fix_headers",
     "depix.gemspec",
     "lib/depix.rb",
-    "lib/depix/benchmark.rb",
-    "lib/depix/binary/descriptor.rb",
     "lib/depix/binary/fields.rb",
+    "lib/depix/binary/rdoc_generator.rb",
     "lib/depix/binary/structure.rb",
     "lib/depix/compact_structs.rb",
+    "lib/depix/describe.rb",
     "lib/depix/editor.rb",
     "lib/depix/enums.rb",
     "lib/depix/reader.rb",
