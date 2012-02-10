@@ -1,4 +1,4 @@
-Film scans and images are usualy shoved about in [DPX files](http://en.wikipedia.org/wiki/Digital_Picture_Exchange).
+Film scans and images are usualy shoved about in http://en.wikipedia.org/wiki/Digital_Picture_Exchange files.
 These files embed a massive amount of metadata which can be used to automatically catalog and search in big
 file collections (and searching is essential since a complete feature film will run well into tens of thousands
 of files). Reading this metadata can easily help with cumbersome tasks like sorting DPX files per reel/timecode,
