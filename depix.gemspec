@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "depix"
-  s.version = "3.0.0"
+  s.version = "3.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Julik Tarkhanov"]
-  s.date = "2011-11-29"
+  s.date = "2012-07-16"
   s.description = "Allows you to read and edit DPX file headers parsed into Ruby objects"
   s.email = "me@julik.nl"
   s.executables = ["depix_describe", "depix_fix_headers"]
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "History.txt",
     "README.rdoc",
     "Rakefile",
+    "bin/depix-describe",
     "bin/depix_describe",
     "bin/depix_fix_headers",
     "depix.gemspec",
@@ -57,7 +58,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://guerilla-di.org/depix"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.11"
+  s.rubygems_version = "1.8.24"
   s.summary = "Read and write DPX file headers"
 
   if s.respond_to? :specification_version then
