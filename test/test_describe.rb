@@ -12,6 +12,13 @@ class TestDescribe < Test::Unit::TestCase
     assert o.include?("03:09:00:17"), "Should include the timecode"
   end
   
+  def test_bam
+    f = '/Volumes/FASZT/HEROCOMPLEX/Herocomplex_DPX_folderPerClip/003/HERO_TAPE_2-1_MOV.0011.dpx'
+    s, o, e = CLITest.new(BIN_P).run(f)
+    assert s.zero?
+    puts o
+  end
+  
   def test_describe_class_simple
     desc =  Depix::Describe.new.describe(SAMPLE_DPX)
     assert_match(/320/, desc)

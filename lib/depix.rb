@@ -15,7 +15,7 @@ require File.expand_path(File.dirname(__FILE__)) + '/depix/editor'
 require File.expand_path(File.dirname(__FILE__)) + '/depix/describe'
 
 module Depix
-  VERSION = '3.0.0'
+  VERSION = '3.0.1'
   
   class InvalidHeader < RuntimeError; end
   

@@ -37,7 +37,7 @@ for a long description or
 
 for a short description.
 
-  $depix-describe ~/Desktop/Storm/E036/E036_L005.0007.dpx
+  $depix_describe ~/Desktop/Storm/E036/E036_L005.0007.dpx
   Describing DPX /Users/julik/Desktop/Storm/E036/E036_L005.0007.dpx. Empty elements are omitted.
   ===================================================
   File information   Endianness (SDPX is big endian) SDPX

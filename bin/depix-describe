@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+$stderr.puts "WARNING: depix-describe is now called depix_describe (that is undersores instead of dashes)"
+$stderr.puts "Uninstall old versions of the depix gem so that the old binary disappears from your shell completions"
+exit 1
+
