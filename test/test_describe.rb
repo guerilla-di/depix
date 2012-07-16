@@ -4,6 +4,7 @@ require "cli_test"
 
 class TestDescribe < Test::Unit::TestCase
   BIN_P = File.dirname(__FILE__) + "/../bin/depix_describe"
+  OBSOLETE_BINARY = File.dirname(__FILE__) + "/../bin/depix-describe"
   SAMPLE_DPX = File.dirname(__FILE__) + '/samples/E012_P001_L000002_lin.0001.dpx'
   
   def test_app
@@ -12,11 +13,10 @@ class TestDescribe < Test::Unit::TestCase
     assert o.include?("03:09:00:17"), "Should include the timecode"
   end
   
-  def test_bam
-    f = '/Volumes/FASZT/HEROCOMPLEX/Herocomplex_DPX_folderPerClip/003/HERO_TAPE_2-1_MOV.0011.dpx'
-    s, o, e = CLITest.new(BIN_P).run(f)
-    assert s.zero?
-    puts o
+  def test_obsolete_binary
+    s, o, e = CLITest.new(OBSOLETE_BINARY).run(File.dirname(__FILE__) + "/samples/gluetools_file_header.dpx")
+    assert !s.zero?
+    assert_match /is now called/, e
   end
   
   def test_describe_class_simple
