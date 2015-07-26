@@ -8,7 +8,7 @@ gem "term-ansicolor"
 gem "update_hints"
 
 group :development do
-  gem "jeweler"
+  gem "jeweler", '1.8.4' # Last one without the stupid nokogiri dependency
   gem "rake"
   gem "cli_test", "~>1.0"
   gem 'test-unit'
