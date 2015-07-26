@@ -1,5 +1,5 @@
 # --ruby--
-source :rubygems
+source 'https://rubygems.org'
 
 gem"timecode", "~> 1.0"
 gem "progressbar", "~> 0.9"
@@ -11,4 +11,5 @@ group :development do
   gem "jeweler"
   gem "rake"
   gem "cli_test", "~>1.0"
+  gem 'test-unit'
 end
