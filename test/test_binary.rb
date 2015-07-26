@@ -648,7 +648,7 @@ end
 
 class TestStructureEmitDSL < Test::Unit::TestCase
   
-  def test_dict_emit_char
+  def test_dict_emit_char_of_48_bytes
     c = Class.new(Structure)
     c.blanking :reserved, :length => 48, :desc => "Reserved"
     assert c.instance_methods.map{|e| e.to_s }.include?("reserved"),
@@ -663,7 +663,7 @@ class TestStructureEmitDSL < Test::Unit::TestCase
   end
   
   
-  def test_dict_emit_char
+  def test_dict_emit_char_of_one_byte
     c = Class.new(Structure)
     c.char :tag, :desc => "Some name"
     assert c.instance_methods.map{|e| e.to_s }.include?("tag"),
